@@ -182,7 +182,7 @@ public class Player : Entity
         if(selectedWeapon >= weapons.Count)
             selectedWeapon = 0;
 
-        if(weaponRemoved)
+        if(selectedWeapon < weapons.Count && weaponRemoved)
             weapons[selectedWeapon].cooldown = 20;
 
         foreach(Weapon weapon in weapons)
