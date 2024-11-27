@@ -31,6 +31,7 @@ bottle cap rifle ( shoots out bottle caps that riccocet off objects (limited amo
 sock slinger ( shoots socks that will slow the cat down if it lands ) 80 delay 1 dmg
 tv remote ( limited battery. turns on tv (kitty tv) which distracts cat ) 0 delay 0 dmg
 toy octopus ( acts like a grapple hook. bound to ZL if obtained ) 240 delay 0 dmg
+boba ( one time use. heals the player about 5hp ) 0 delay 0 dmg
 
 collectables:
 

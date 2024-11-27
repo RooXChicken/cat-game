@@ -1,8 +1,10 @@
+using System.Runtime.InteropServices;
 using SDL2;
 using static SDL2.SDL;
 
 public class RenderWindow
 {
+    //public static bool audioEnabled { get; private set; }
     public bool open { get; private set; }
     private nint window;
 
@@ -35,7 +37,7 @@ public class RenderWindow
 
         cameraCenter = new Vector2d(0, 0);
 
-        initWindow(_rWidth, _rHeight, _name, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
+        initWindow(_rWidth, _rHeight, _name, SDL_WindowFlags.SDL_WINDOW_SHOWN);
         initRenderer(_gWidth, _gHeight);
 
         font = new Font("assets/font.ttf", 10);
@@ -44,13 +46,13 @@ public class RenderWindow
         open = true;
     }
 
-    public void initWindow(uint _rWidth, uint _rHeight, string _name, SDL.SDL_WindowFlags _flags)
+    public void initWindow(uint _rWidth, uint _rHeight, string _name, SDL_WindowFlags _flags)
     {
         rWidth = _rWidth;
         rHeight = _rHeight;
         name = _name;
 
-        window = SDL_CreateWindow(name, SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, (int)rWidth, (int)rHeight, _flags);
+        window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)rWidth, (int)rHeight, _flags);
     }
 
     private void initRenderer(uint _gWidth, uint _gHeight)
@@ -58,7 +60,7 @@ public class RenderWindow
         gWidth = _gWidth;
         gHeight = _gHeight;
 
-        renderer = SDL_CreateRenderer(window, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
         if(renderer == IntPtr.Zero)
             Console.WriteLine("Error creating SDL renderer! " + SDL.SDL_GetError());
 
@@ -113,7 +115,7 @@ public class RenderWindow
                 case SDL_EventType.SDL_JOYBUTTONDOWN: Input._joyDown(e); break;
                 case SDL_EventType.SDL_JOYBUTTONUP: Input._joyUp(e); break;
 
-                case SDL_EventType.SDL_AUDIODEVICEADDED: registerSound(); break;
+                //case SDL_EventType.SDL_AUDIODEVICEADDED: registerSound(); break;
             }
         }
     }
@@ -124,6 +126,8 @@ public class RenderWindow
             Console.WriteLine("Error opening audio! " + SDL_mixer.Mix_GetError());
 
         SDL_mixer.Mix_AllocateChannels(128);
+
+        //audioEnabled = true;
     }
 
     //rendering
@@ -145,4 +149,7 @@ public class RenderWindow
     public void drawNC(Drawable drawable) { drawable.draw(renderer, new Vector2d(0, 0)); }
 
     public void display() { SDL_SetRenderTarget(renderer, IntPtr.Zero); SDL_RenderCopy(renderer, surface, IntPtr.Zero, IntPtr.Zero); SDL_RenderPresent(renderer); }
+
+    [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SDL_RenderCopyExF(IntPtr renderer, IntPtr texture, ref SDL_Rect srcrect, ref SDL_FRect dstrect, double angle, ref SDL_FPoint center, SDL_RendererFlip flip);
 }

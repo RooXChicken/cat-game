@@ -1,11 +1,13 @@
 
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Security.Cryptography;
 
 public class Player : Entity
 {
     private int bg = -1;
     private Sprite sit;
+    private Sprite down;
     private Sprite idle;
     private Sprite idleArms;
     private Sprite walk;
@@ -24,9 +26,9 @@ public class Player : Entity
     private Sprite healthBar;
     private Sprite crosshair;
 
-    private List<Weapon> weapons;
+    public List<Weapon> weapons;
     private int selectedWeapon = 999;
-    private int queuedWeapon = 0;
+    public int queuedWeapon = 0;
 
     private double moveSpeed = 0.12;
 
@@ -35,18 +37,23 @@ public class Player : Entity
 
     private int damageCooldown = 0;
     private SoundEffect damageSound;
-    private bool hasGrapple = false;
+    public bool hasGrapple = false;
 
     private OctopusGrapple currentGrapple;
     public bool grappleOut = false;
     private int grappleCooldown = 0;
     private Vector2d lastCrosshairPosition;
 
-    public Player(int _bg, Vector2d _position) : base(_position, 1, new Hitbox(new Vector2d(24,24)))
+    public Player(int _bg, Vector2d _position) : base(_position, 1, null)
     {
         bg = _bg;
         //bg = -1;
         Input.registerController(bg);
+        
+        hitbox = new Hitbox(new Vector2d(12,24));
+        hitbox.offset = new Vector2d(6, 0);
+        hitbox.setPosition(_position);
+        
         crosshair = new Sprite("assets/sprites/crosshair.png");
         healthBar = new Sprite("assets/sprites/player/healthbar.png");
         healthBar.offset = new Vector2d(2, 25);
@@ -55,6 +62,7 @@ public class Player : Entity
         crosshair.offset = new Vector2d(-3.5, -3.5);
         idle = new Sprite("assets/sprites/player/bellaidle.png");
         sit = new Sprite("assets/sprites/player/bellasit.png");
+        down = new Sprite("assets/sprites/player/belladown.png");
         idleArms = new Sprite("assets/sprites/player/bellaidlearms.png");
         walk = new Sprite("assets/sprites/player/bellawalk.png");
         walkArms = new Sprite("assets/sprites/player/bellawalkarms.png");
@@ -73,19 +81,9 @@ public class Player : Entity
 
         idle.offset = new Vector2d(0, -8);
         sit.offset = new Vector2d(0, -8);
-        idleArms.offset = new Vector2d(0, -8);
-        sit.offset = new Vector2d(0, -8);
+        down.offset = new Vector2d(0, -8);
         idleArms.offset = new Vector2d(0, -8);
         walk.offset = new Vector2d(0, -8);
-        walkArms.offset = new Vector2d(0, -8);
-
-        shootMArms.offset = new Vector2d(0, -8);
-        shootM2Arms.offset = new Vector2d(0, -8);
-        shootUArms.offset = new Vector2d(0, -8);
-        shootU2Arms.offset = new Vector2d(0, -8);
-        shootDArms.offset = new Vector2d(0, -8);
-        shootD2Arms.offset = new Vector2d(0, -8);
-
         walkArms.offset = new Vector2d(0, -8);
 
         shootMArms.offset = new Vector2d(0, -8);
@@ -123,6 +121,29 @@ public class Player : Entity
     {
         base.tick();
 
+        if(health <= 0)
+        {
+            health = 0;
+            down.size.x = ((Sprite)drawable).size.x;
+            drawable = down;
+            velocity = new Vector2d(0, 0);
+            arms = null;
+            teleport(getRawPosition());
+            foreach(Weapon weapon in weapons)
+            {
+                weapon.sprite.rotation = 0;
+                weapon.sprite.size.x = Math.Abs(weapon.sprite.size.x);
+                weapon.sprite.size.y = Math.Abs(weapon.sprite.size.y);
+
+                WeaponPickup pickup = new WeaponPickup(getRawPosition(), weapon);
+                pickup.velocity = new Vector2d(Game.random.NextDouble()*6-3, Game.random.NextDouble()*6-3);
+
+                Game.spawnEntity(pickup);
+            }
+            weapons.Clear();
+            return;
+        }
+
         if(bg == -1)
         {
             if(Input.isJustPressed(SDL2.SDL.SDL_Keycode.SDLK_1))
@@ -144,6 +165,11 @@ public class Player : Entity
                 queuedWeapon++;
         }
 
+        
+        bool weaponRemoved = (selectedWeapon < weapons.Count && weapons[selectedWeapon].destroy);
+        if(weaponRemoved)
+            weapons.Remove(weapons[selectedWeapon]);
+
         if(queuedWeapon >= weapons.Count)
             queuedWeapon = 0;
         
@@ -155,6 +181,9 @@ public class Player : Entity
 
         if(selectedWeapon >= weapons.Count)
             selectedWeapon = 0;
+
+        if(weaponRemoved)
+            weapons[selectedWeapon].cooldown = 20;
 
         foreach(Weapon weapon in weapons)
             weapon.tick();
@@ -189,7 +218,7 @@ public class Player : Entity
                 useWeapon = true;
 
             if(useWeapon)
-                weapons[selectedWeapon].use(crosshairDirection, getCenter()+crosshairDirection*3);
+                weapons[selectedWeapon].use(this, crosshairDirection, getCenter()+crosshairDirection*3);
         }
 
         if(hasGrapple)
@@ -219,21 +248,25 @@ public class Player : Entity
                 grappleCooldown--;
         }
 
+        Vector2d moveVector = new Vector2d(0, 0);
+
         if(bg == -1)
         {
             if(Input.isPressed(SDL2.SDL.SDL_Keycode.SDLK_d))
-                velocity.x += moveSpeed;
+                moveVector.x += moveSpeed;
             if(Input.isPressed(SDL2.SDL.SDL_Keycode.SDLK_a))
-                velocity.x -= moveSpeed;
+                moveVector.x -= moveSpeed;
             if(Input.isPressed(SDL2.SDL.SDL_Keycode.SDLK_s))
-                velocity.y += moveSpeed;
+                moveVector.y += moveSpeed;
             if(Input.isPressed(SDL2.SDL.SDL_Keycode.SDLK_w))
-                velocity.y -= moveSpeed;
+                moveVector.y -= moveSpeed;
         }
         else
-            velocity += Input.getJoyAxis(bg, 0) * moveSpeed;
+            moveVector += Input.getJoyAxis(bg, 0) * moveSpeed;
 
-        if(Math.Abs(velocity.x) + Math.Abs(velocity.y) < 0.05)
+        velocity += moveVector;
+
+        if(Math.Abs(moveVector.x) + Math.Abs(moveVector.y) < 0.05 && Math.Abs(velocity.x) + Math.Abs(velocity.y) < 0.05)
         {
             drawable = idle;
             arms = idleArms;
@@ -265,29 +298,43 @@ public class Player : Entity
 
         basicCollision();
 
-        Item closest = null;
+        Interactable closest = null;
         double closestDistance = Double.MaxValue;
-        foreach(Item item in Game.entities[9])
+        foreach(WeaponPickup item in Game.entities[9])
         {
-            item.tooltip.active = false;
+            item.interactable.tooltip.active = false;
 
-            double _distance = item.getRawPosition().distanceSquared(getCenter());
+            double _distance = item.getRawPosition().distanceSquared(getRawPosition());
             if(_distance < closestDistance)
             {
-                closest = item;
+                closest = item.interactable;
+                closestDistance = _distance;
+            }
+        }
+
+        foreach(StorageCabinet cabinet in Game.entities[10])
+        {
+            cabinet.interactable.tooltip.active = false;
+            if(cabinet.interactable.remove)
+                continue;
+
+            double _distance = cabinet.getRawPosition().distanceSquared(getRawPosition());
+            if(_distance < closestDistance)
+            {
+                closest = cabinet.interactable;
                 closestDistance = _distance;
             }
         }
 
         if(closest != null && closestDistance < 32)
         {
-            closest.tooltipPosition = getRawPosition() + new Vector2d(28, 1);
+            closest.position = getRawPosition() + new Vector2d(28, 1);
             closest.tooltip.active = true;
             bool pickupClosest = false;
 
             if(bg == -1)
             {
-                if(Input.isJustPressed(SDL2.SDL.SDL_Keycode.SDLK_SPACE))
+                if(Input.isJustPressed(SDL2.SDL.SDL_Keycode.SDLK_e))
                     pickupClosest = true;
             }
             else
@@ -298,15 +345,7 @@ public class Player : Entity
 
             if(pickupClosest)
             {
-                if(closest.weapon.id != 5)
-                {
-                    queuedWeapon = weapons.Count;
-                    weapons.Add(closest.weapon);
-                }
-                else
-                    hasGrapple = true;
-
-                closest.kill();
+                closest.interact(this);
             }
         }
 
@@ -322,9 +361,11 @@ public class Player : Entity
 
         addVelocity();
 
-        anim += Math.Abs(velocity.x)/16 + Math.Abs(velocity.y)/16;
+        anim += ((velocity.x)/16 + (velocity.y)/16) * (direction ? 1 : -1);
         if(anim > 6)
             anim = 0;
+        if(anim < 0)
+            anim = 5.9;
 
         if(lastCrosshairPosition.x < getCenter().x)
             direction = false;
@@ -337,14 +378,14 @@ public class Player : Entity
         if(direction)
         {
             ((Sprite)drawable).size.x = 1;
-            ((Sprite)arms).size.x = 1;
-            ((Sprite)arms2).size.x = 1;
+            arms.size.x = 1;
+            arms2.size.x = 1;
         }
         else
         {
             ((Sprite)drawable).size.x = -1;
-            ((Sprite)arms).size.x = -1;
-            ((Sprite)arms2).size.x = -1;
+            arms.size.x = -1;
+            arms2.size.x = -1;
         }
 
         velocity.x *= 0.9;
@@ -385,8 +426,11 @@ public class Player : Entity
             window.draw(weapons[selectedWeapon].sprite);
         }
 
-        arms.position = getBlendPosition(alpha);
-        window.draw(arms);
+        if(arms != null)
+        {
+            arms.position = getBlendPosition(alpha);
+            window.draw(arms);
+        }
 
         Vector2d crosshairRawPosition = new Vector2d(0, 0);
         if(bg == -1)
@@ -400,7 +444,7 @@ public class Player : Entity
             double lJoyValue = Math.Abs(Input.getJoyAxis(bg, 0).x) + Math.Abs(Input.getJoyAxis(bg, 0).y);
 
             crosshairRawPosition = (Vector2d)(rJoyValue != 0 ? (Input.getJoyAxis(bg, 1)*63) : (Input.getJoyAxis(bg, 0)*32));
-            crosshair.color.a = (byte)(Math.Min(254, lastCrosshairPosition.distanceSquared(getRawPosition())*4));
+            crosshair.color.a = (byte)(Math.Min(254, crosshair.position.distanceSquared(getRawPosition())*4));
         }
 
         crosshair.position = getBlendPosition(alpha) + crosshairRawPosition + new Vector2d(idle.textureBounds.w/2.0, idle.textureBounds.h/2.0 - 8);
@@ -412,5 +456,10 @@ public class Player : Entity
             window.draw(new Rectangle(healthBar.position + healthBar.offset + new Vector2d(0, 1), new Vector2d(20 * (health/maxHealth), 3), new Color(61, 140, 64)));
             window.draw(healthBar);
         }
+    }
+
+    public void heal(double _hp)
+    {
+        health = Math.Min(maxHealth, health + _hp);
     }
 }

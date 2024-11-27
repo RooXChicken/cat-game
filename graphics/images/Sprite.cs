@@ -19,24 +19,29 @@ public class Sprite : Drawable
 
     public Sprite(string path)
     {
-        texture = new Texture(renderer, path);
-        init();
+        init(new Texture(renderer, path), new Vector2d(0, 0));
+    }
+
+    public Sprite(string path, Vector2d _offset)
+    {
+        init(new Texture(renderer, path), _offset);
     }
 
     public Sprite(Texture _texture)
     {
         texture = _texture;
-        init();
+        init(_texture, new Vector2d(0, 0));
     }
 
-    private void init()
+    private void init(Texture _texture, Vector2d _offset)
     {
+        texture = _texture;
         position = new Vector2d(0, 0);
         size = new Vector2d(1, 1);
 
         textureBounds = texture.rect;
         origin = new Vector2d(textureBounds.w/2.0, textureBounds.h/2.0);
-        offset = new Vector2d(0, 0);
+        offset = _offset;
         rotation = 0;
 
         SDL_SetTextureBlendMode(texture.pointer, SDL_BlendMode.SDL_BLENDMODE_BLEND);

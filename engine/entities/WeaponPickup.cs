@@ -17,6 +17,18 @@ public class WeaponPickup : Entity
         Game.spawnEntity(shadow);
     }
 
+    public override void tick()
+    {
+        base.tick();
+
+        basicCollision();
+        
+        addVelocity();
+
+        velocity.x *= 0.9;
+        velocity.y *= 0.9;
+    }
+
     public override void draw(RenderWindow window, float alpha)
     {
         base.draw(window, alpha);

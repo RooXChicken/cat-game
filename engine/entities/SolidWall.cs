@@ -4,7 +4,7 @@ public class SolidWall : Entity
     public SolidWall(Vector2d _position, Vector2d _size, byte _collision = 4) : base(_position, _collision)
     {
         hitbox = new Hitbox(_size);
-        hitbox.position = _position;
+        hitbox.setPosition(_position);
         
         solid = true;
     }

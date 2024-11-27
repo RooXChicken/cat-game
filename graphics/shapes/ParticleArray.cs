@@ -3,6 +3,7 @@ using static SDL2.SDL;
 
 public class ParticleArray : Drawable
 {
+    public static readonly int PARTICLE_COUNT = 3;
     private Texture texture;
     public List<Particle> particles;
 
@@ -25,22 +26,22 @@ public class ParticleArray : Drawable
             array[i].position.x = (float)(particles[i/4].position.x - cameraCenter.x);
             array[i].position.y = (float)(particles[i/4].position.y - cameraCenter.y);
             array[i].tex_coord.x = (float)particles[i/4].u;
-            array[i].tex_coord.y = (float)particles[i/4].v;
+            array[i].tex_coord.y = (float)(particles[i/4].id * 1.0/PARTICLE_COUNT);
 
             array[i+1].position.x = (float)(particles[i/4].position.x - cameraCenter.x + particles[i/4].size.x);
             array[i+1].position.y = (float)(particles[i/4].position.y - cameraCenter.y);
             array[i+1].tex_coord.x = (float)particles[i/4].u + (float)particles[i/4].uS;
-            array[i+1].tex_coord.y = (float)particles[i/4].v;
+            array[i+1].tex_coord.y = (float)(particles[i/4].id * 1.0/PARTICLE_COUNT);
 
             array[i+2].position.x = (float)(particles[i/4].position.x - cameraCenter.x);
             array[i+2].position.y = (float)(particles[i/4].position.y - cameraCenter.y + particles[i/4].size.y);
             array[i+2].tex_coord.x = (float)particles[i/4].u;
-            array[i+2].tex_coord.y = (float)particles[i/4].v + (float)particles[i/4].vS;
+            array[i+2].tex_coord.y = (float)(particles[i/4].id * 1.0/PARTICLE_COUNT + 1.0/PARTICLE_COUNT);
 
             array[i+3].position.x = (float)(particles[i/4].position.x - cameraCenter.x + particles[i/4].size.x);
             array[i+3].position.y = (float)(particles[i/4].position.y - cameraCenter.y + particles[i/4].size.y);
             array[i+3].tex_coord.x = (float)particles[i/4].u + (float)particles[i/4].uS;
-            array[i+3].tex_coord.y = (float)particles[i/4].v + (float)particles[i/4].vS;
+            array[i+3].tex_coord.y = (float)(particles[i/4].id * 1.0/PARTICLE_COUNT + 1.0/PARTICLE_COUNT);
 
             for(int k = 0; k < 4; k++)
             {

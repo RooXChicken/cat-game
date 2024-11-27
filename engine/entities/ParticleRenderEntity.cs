@@ -7,7 +7,7 @@ public class ParticleRenderEntity : Entity
     public ParticleRenderEntity(ParticleArray _array) : base(new Vector2d(0, 0), 0)
     {
         array = _array;
-        drawOrder = 3;
+        drawOrder = 4;
     }
 
     public override void draw(RenderWindow window, float alpha)

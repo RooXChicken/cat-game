@@ -16,9 +16,9 @@ public class BottleCapRifle : Weapon
         damage = 1;
     }
 
-    public override bool use(Vector2d direction, Vector2d position)
+    public override bool use(Player player, Vector2d direction, Vector2d position)
     {
-        if(!base.use(direction, position))
+        if(!base.use(player, direction, position))
             return false;
 
         Game.spawnEntity(new BottleCap(position, direction, damage, new Sprite("assets/sprites/projectiles/bottle_cap.png"), 0, 4.5));

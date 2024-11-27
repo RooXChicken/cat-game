@@ -11,6 +11,7 @@ public class StorageInteractable : Interactable
         base.interact(player);
         cabinet.toSpawn.shadow.render = true;
         cabinet.toSpawn.teleport(cabinet.getRawPosition() + offset);
+        cabinet.sprite = new Sprite("assets/sprites/decor/storage_open.png");
 
         Game.spawnEntity(cabinet.toSpawn);
     }

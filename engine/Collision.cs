@@ -41,6 +41,8 @@ public class Collision
         bottom = _bottom;
     }
 
+    // i am working on this
+
     public static Collision AABB(Vector2d position1, Vector2d size1, Vector2d position2, Vector2d size2)
     {
         if(!(position1.x < position2.x + size2.x && position1.x + size1.x > position2.x && position1.y < position2.y + size2.y && position1.y + size1.y > position2.y))
@@ -62,13 +64,15 @@ public class Collision
         if(!entity1.solid || !entity2.solid || entity1.remove || entity2.remove)
             return new CollisionPair();
             
-        for(int i = 1; i <= iter; i++)
+        for(int i = 0; i <= iter; i++)
         {
-            Collision collisionX = AABB(entity1.hitbox.position + new Vector2d(entity1.getVelocity().x * (i/iter), 0), entity1.hitbox.size, entity2.hitbox.position, entity2.hitbox.size);
-            Collision collisionY = AABB(entity1.hitbox.position + new Vector2d(0, entity1.getVelocity().y * (i/iter)), entity1.hitbox.size, entity2.hitbox.position, entity2.hitbox.size);
+            Collision collisionX = AABB(entity1.hitbox.getPosition() + new Vector2d(entity1.getVelocity().x * (i/iter), 0), entity1.hitbox.size, entity2.hitbox.getPosition(), entity2.hitbox.size);
+            Collision collisionY = AABB(entity1.hitbox.getPosition()+ new Vector2d(0, entity1.getVelocity().y * (i/iter)), entity1.hitbox.size, entity2.hitbox.getPosition(), entity2.hitbox.size);
             
             if(collisionX.type == CollisionType.none && collisionY.type == CollisionType.none)
                 continue;
+
+            //Console.WriteLine(collisionX.type + " | " + collisionY.type);
 
             return new CollisionPair(collisionX, collisionY);
         }

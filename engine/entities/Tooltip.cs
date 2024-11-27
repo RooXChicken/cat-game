@@ -9,12 +9,12 @@ public class Tooltip : Entity
     private Text text;
     public Vector2d tooltipPosition;
 
-    public Tooltip(Vector2d position, string _name, string _desc) : base(position, 0)
+    public Tooltip(Vector2d position, string _name, string _desc, bool shadow = true, string path = "assets/sprites/gui/tooltip.png") : base(position, 0)
     {
         name = _name;
         desc = _desc;
 
-        tooltip = new Sprite("assets/sprites/gui/tooltip.png");
+        tooltip = new Sprite(path);
         tooltip.color = new Color(255, 255, 255, 196);
         text = new Text(Sprite.renderer, name + "\n" + desc, RenderWindow.gameFont, tooltip.color);
 

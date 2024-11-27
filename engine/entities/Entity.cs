@@ -8,8 +8,8 @@ public class Entity : IComparable<Entity>
 
     public Vector2d velocity;
 
-    protected double maxHealth = 1.0;
-    protected double health = 1.0;
+    public double maxHealth { get; protected set; }
+    public double health { get; protected set; }
     public bool damageable { get; protected set; }
 
     public byte collision { get; protected set; }
@@ -32,6 +32,9 @@ public class Entity : IComparable<Entity>
 
         velocity = new Vector2d(0, 0);
         hitbox = _hitbox;
+
+        maxHealth = 1;
+        health = 1;
 
         pushable = false;
         drawOrder = 0;
@@ -57,7 +60,7 @@ public class Entity : IComparable<Entity>
     public void kill() { remove = true; onKill(); }
     public virtual void onKill() { }
 
-    public virtual void tick() { if(hitbox != null) hitbox.position = getRawPosition(); }
+    public virtual void tick() { if(hitbox != null) hitbox.setPosition(getRawPosition()); }
     protected bool basicCollision()
     {
         bool hit = false;
@@ -66,7 +69,7 @@ public class Entity : IComparable<Entity>
             if(entity == this || !entity.solid)
                 continue;
                 
-            CollisionPair collision = Collision.EECD(this, entity, 4);
+            CollisionPair collision = Collision.EECD(this, entity, 16);
             if(collision.valid)
             {
                 hit = true;
@@ -89,14 +92,14 @@ public class Entity : IComparable<Entity>
     }
 
     public virtual bool genericCollision(Entity entity) { return !ignored.Contains(entity.collision); }
-    public virtual void basicRightCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = 0; setPosition(new Vector2d(collision.right, getRawPosition().y));}
-    public virtual void basicLeftCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = 0; setPosition(new Vector2d(collision.left, getRawPosition().y));}
+    public virtual void basicRightCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = -(hitbox.getPosition().x - collision.right); /* setPosition(new Vector2d(collision.right, getRawPosition().y));*/}
+    public virtual void basicLeftCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = -(hitbox.getPosition().x - collision.left); /* setPosition(new Vector2d(collision.left, getRawPosition().y));*/}
 
-    public virtual void basicTopCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = 0; setPosition(new Vector2d(getRawPosition().x, collision.top)); }
-    public virtual void basicBottomCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = 0; setPosition(new Vector2d(getRawPosition().x, collision.bottom)); }
+    public virtual void basicTopCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = -(hitbox.getPosition().y - collision.top); /* setPosition(new Vector2d(getRawPosition().x, collision.top)); */}
+    public virtual void basicBottomCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = -(hitbox.getPosition().y - collision.bottom); /* setPosition(new Vector2d(getRawPosition().x, collision.bottom));*/ }
 
     public virtual void draw(RenderWindow window, float alpha)
-    {
+    {       
         if(drawable == null)
             return;
 

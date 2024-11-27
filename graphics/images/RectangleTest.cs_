@@ -1,0 +1,66 @@
+using SDL2;
+using static SDL2.SDL;
+
+public class RectangleTest : Drawable
+{
+    public Vector2d size;
+
+    public RectangleTest(Vector2d _position, Vector2d _size, Color _color)
+    {
+        position = _position;
+        size = _size;
+        color = _color;
+    }
+
+    public override void draw(nint surface, Vector2d cameraCenter)
+    {
+        position = (Vector2d)Input.getMousePosition()/2;
+        SDL_Rect rect1;
+        rect1.x = (int)(position.x - cameraCenter.x);
+        rect1.y = (int)(position.y - cameraCenter.y);
+        rect1.w = (int)(Math.Abs(size.x));
+        rect1.h = (int)(Math.Abs(size.y));
+
+        SDL_Rect rect2;
+        rect2.x = (int)(200 - cameraCenter.x);
+        rect2.y = (int)(200 - cameraCenter.y);
+        rect2.w = (int)(Math.Abs(size.x));
+        rect2.h = (int)(Math.Abs(size.y));
+
+        SDL_Rect output;
+
+        // SDL_RendererFlip flip = SDL_RendererFlip.SDL_FLIP_NONE;
+        // if(size.x < 0)
+        //     flip |= SDL_RendererFlip.SDL_FLIP_HORIZONTAL;
+        // if(size.y < 0)
+        //     flip |= SDL_RendererFlip.SDL_FLIP_VERTICAL;
+
+        color = new Color(255, 255, 255);
+        base.draw(surface, cameraCenter);
+
+        SDL_Point point;
+        point.x = 0;
+        point.y = 0;
+
+        if(SDL_IntersectRect(ref rect1, ref rect2, out output) != SDL_bool.SDL_FALSE)
+        {
+            color = new Color(255, 0, 0);
+            // Console.WriteLine("rect1 " + rect1.x + " | " + rect1.y);
+            // Console.WriteLine("rect2 " + rect2.x + " | " + rect2.y);
+            // Console.WriteLine("out   " + output.x + " | " + output.y);
+
+            rect1.x += (int)size.x - (output.x - rect2.x);
+            rect1.y += (int)size.y - (output.y - rect2.y);
+            point.x = output.x;
+            point.y = output.y;
+        }
+
+        SDL_RenderFillRect(surface, ref rect2);
+        base.draw(surface, cameraCenter);
+        SDL_RenderFillRect(surface, ref rect1);
+        
+        color = new Color(0, 0, 255);
+        base.draw(surface, cameraCenter);
+        SDL_RenderDrawPoint(surface, point.x, point.y);
+    }
+}

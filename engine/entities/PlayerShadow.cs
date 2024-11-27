@@ -7,6 +7,8 @@ public class PlayerShadow : Entity
     private Entity player;
     public Sprite shadow;
 
+    public bool render = true;
+
     public PlayerShadow(Entity _player) : base(_player.getRawPosition(), 0)
     {
         player = _player;
@@ -20,5 +22,13 @@ public class PlayerShadow : Entity
     public override void tick()
     {
         teleport(player.getRawPosition());
+    }
+
+    public override void draw(RenderWindow window, float alpha)
+    {
+        if(!render)
+            return;
+            
+        base.draw(window, alpha);
     }
 }
