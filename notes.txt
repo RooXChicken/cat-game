@@ -1,0 +1,38 @@
+gavin favorite color is blue
+bella's is lavendar
+
+https://blog.rubenwardy.com/2023/01/24/using_sdl_gamecontroller/
+
+game ideas:
+
+two phases of game loop:
+scavenge phase ( search house for randomly generated weapons ( inside of containers such as drawers ) )
+tame phase ( try and tame the cat )
+
+taming the cat is dealing enough 'damage' to it so that it becomes friendly
+each cat gets their own phase two
+
+boba: can eat food to heal
+bean: hops on the wheel which allows her to knock it over and roll it around
+gerry: becomes more aggresive and 'out of control'
+
+weapon ideas:
+
+catnip cannon ( shoots out catnip, making cats faster and stronger. makes damage taken increase ) 120 delay 0 dmg
+yarn ( temporarily distracts cats ) 0 delay 0 dmg
+treat pistol ( pistol which shoots cat treats ) 40 delay 2 dmg
+water gun ( push the cat back, but if in a corner it will launch towards you )
+crinkle ball blaster ( pom pom crinkle ball thingies ) 20 delay 0.5 dmg
+feather ( sword like weapon ) 40 delay 3 dmg
+q-tip rifle ( shoots out a lot of small q-tips ) 18 delay 1 dmg
+cucumber ( cat will avoid going near here ) 0 delay 0 dmg
+laser pointer ( limited battery. cat will follow the cursor (where the laser pointer is) ) 0 delay 0 dmg
+bottle cap rifle ( shoots out bottle caps that riccocet off objects (limited amount of times) ) 30 delay 1 dmg
+sock slinger ( shoots socks that will slow the cat down if it lands ) 80 delay 1 dmg
+tv remote ( limited battery. turns on tv (kitty tv) which distracts cat ) 0 delay 0 dmg
+toy octopus ( acts like a grapple hook. bound to ZL if obtained ) 240 delay 0 dmg
+
+collectables:
+
+copy of bellas book
+gi

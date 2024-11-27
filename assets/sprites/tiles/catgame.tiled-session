@@ -1,0 +1,44 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "untitled.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "catgame.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 11
+        },
+        "untitled.tmx": {
+            "scale": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 138.66666666666666,
+                "y": 342.16666666666663
+            }
+        }
+    },
+    "last.imagePath": "/home/roo/Projects/c#/catgame/assets/sprites/tiles",
+    "map.height": 80,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 80,
+    "openFiles": [
+        "catgame.tsx",
+        "untitled.tmx"
+    ],
+    "project": "catgame.tiled-project",
+    "recentFiles": [
+        "catgame.tsx",
+        "untitled.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
