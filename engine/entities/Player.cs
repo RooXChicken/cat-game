@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 
 public class Player : Entity
 {
+    public int type { get; private set; }
     private int bg = -1;
     private Sprite sit;
     private Sprite down;
@@ -44,9 +45,10 @@ public class Player : Entity
     private int grappleCooldown = 0;
     private Vector2d lastCrosshairPosition;
 
-    public Player(int _bg, Vector2d _position) : base(_position, 1, null)
+    public Player(int _bg, Vector2d _position, int _type) : base(_position, 1, null)
     {
         bg = _bg;
+        type = _type;
         //bg = -1;
         Input.registerController(bg);
         
@@ -106,7 +108,7 @@ public class Player : Entity
         drawOrder = 3;
         solid = true;
         pushable = false;
-        pushForce = 1;
+        pushForce = 2;
 
         ignored.Add(2);
         ignored.Add(3);
@@ -443,7 +445,7 @@ public class Player : Entity
             double rJoyValue = Math.Abs(Input.getJoyAxis(bg, 1).x) + Math.Abs(Input.getJoyAxis(bg, 1).y);
             double lJoyValue = Math.Abs(Input.getJoyAxis(bg, 0).x) + Math.Abs(Input.getJoyAxis(bg, 0).y);
 
-            crosshairRawPosition = (Vector2d)(rJoyValue != 0 ? (Input.getJoyAxis(bg, 1)*63) : (Input.getJoyAxis(bg, 0)*32));
+            crosshairRawPosition = (Vector2d)(rJoyValue > 0.2 ? (Input.getJoyAxis(bg, 1)*63) : (Input.getJoyAxis(bg, 0)*32));
             crosshair.color.a = (byte)(Math.Min(254, crosshair.position.distanceSquared(getRawPosition())*4));
         }
 

@@ -3,6 +3,8 @@ bella's is lavendar
 
 https://blog.rubenwardy.com/2023/01/24/using_sdl_gamecontroller/
 
+gavin is wearing a beanie
+
 game ideas:
 
 two phases of game loop:
@@ -18,22 +20,66 @@ gerry: becomes more aggresive and 'out of control'
 
 weapon ideas:
 
-catnip cannon ( shoots out catnip, making cats faster and stronger. makes damage taken increase ) 120 delay 0 dmg
-yarn ( temporarily distracts cats ) 0 delay 0 dmg
-treat pistol ( pistol which shoots cat treats ) 40 delay 2 dmg
+[x] catnip cannon ( shoots out catnip, making cats faster and stronger. makes damage taken increase ) 120 delay 0 dmg
+[x] treat pistol ( pistol which shoots cat treats ) 40 delay 2 dmg
 water gun ( push the cat back, but if in a corner it will launch towards you )
-crinkle ball blaster ( pom pom crinkle ball thingies ) 20 delay 0.5 dmg
+[x] crinkle ball blaster ( pom pom crinkle ball thingies ) 20 delay 0.5 dmg
 feather ( sword like weapon ) 40 delay 3 dmg
 q-tip rifle ( shoots out a lot of small q-tips ) 18 delay 1 dmg
-cucumber ( cat will avoid going near here ) 0 delay 0 dmg
-laser pointer ( limited battery. cat will follow the cursor (where the laser pointer is) ) 0 delay 0 dmg
-bottle cap rifle ( shoots out bottle caps that riccocet off objects (limited amount of times) ) 30 delay 1 dmg
+[x] bottle cap rifle ( shoots out bottle caps that riccocet off objects (limited amount of times) ) 30 delay 1 dmg
 sock slinger ( shoots socks that will slow the cat down if it lands ) 80 delay 1 dmg
+pumpkin scooper ( scoops pumpkin and throws it at the cat. will make cats angry except gerry ) 80 delay 2 dmg (gerry)
+
+
+item ideas:
+
 tv remote ( limited battery. turns on tv (kitty tv) which distracts cat ) 0 delay 0 dmg
-toy octopus ( acts like a grapple hook. bound to ZL if obtained ) 240 delay 0 dmg
-boba ( one time use. heals the player about 5hp ) 0 delay 0 dmg
+[x] toy octopus ( acts like a grapple hook. bound to ZL if obtained ) 240 delay 0 dmg
+yarn ( temporarily distracts cats ) 0 delay 0 dmg
+cucumber ( cat will avoid going near here ) 0 delay 0 dmg
+plant ( acts as shield. the cat will damage the plant instead of you for it's health ) 4hp
+laser pointer ( limited battery. cat will follow the cursor (where the laser pointer is) ) 0 delay 0 dmg
+[x] boba ( one time use. heals the player 20hp ) 0 delay 0 dmg
+coffee ( makes you run faster for a period of time ) 20s
+karaoke machine ( if used by bella it makes the cats angrier. if used by gavin it makes the cats calmer ) 8s
+peanut butter apple ( heals the player for 5hp )
+mocchi ( heals the player for 8hp )
+lucky bag ( gives you 3 random positive items )
+dying plant ( if you can water the plant enough (random intervals to distract), it will give both players a permanent damage bonus )
+toy bird ( will launch where thrown, distracting the cat until it lands on the floor. ) 120 delay 0 dmg
+loaf of bread ( makes the cat loaf on the floor, pausing it ) 5s
+
+bella's lost halloween candy:
+can only be found by gavin.
+if found by gavin, it will heal 6hp
+once found by gavin, it can spawn eaten halloween candy
+if found by bella, it's nothing but wrappers
+
+polaroid: ( if used when both players are nearby, it will heal them both ) 4hp
+new world ( will remove all negative effects ) tooltip: "this button was pressed a lot"
+banana bread ( multi use healing item ) 2hp x 4 tooltip: "baked with the secret ingredient of motherly love"
+chalk ( increases friction, allowing for faster acceleration ) 30s
+pineapple ( heals bella for 1hp, heals gavin for 6hp ) tooltip: "bella's 'favorite' item"
+
+negative item ideas:
+
+cinammon ( leaves a trail of cinammon following you. makes the ground slipperier ) 10s
+phone ( if used by bella, she makes a short video on music.ly, being paused. if used by gavin, he goes on social media, being paused ) requires the other player to interact with them to cancel
+pumpkin spice ( reduces the effectiveness of all healing items )
+turnip ( duplicates every 8 seconds. will heal the cat if touched ) 1hp (-1hp for player)
+IDEA: japanese dictionary ( switches the language to japanese. very hard and might not do ) 30s
+rice porridge ( slows the player down ) 12s 3hp
+clothing tag ( makes movement jittery ) 8s tooltip: "'BUGS YOU!!'"
+raw fish ( cat targets the player and is faster ) 24s
+warrior cat book ( if picked up by bella, it forces gavin to read the book with her, halting progression ) 5s
+worn toy cat ( makes the next 3 storage containers pick  ) tooltip: "The gift that keeps on giving!"
 
 collectables:
 
-copy of bellas book
-gi
+copy of bellas book ( new york times #1 best seller )
+gi ( it's been used heavily )
+things from anime
+drawing tablet ( used for "photo editing". would never be stolen )
+lucky cat (  )
+typewriter ( it's still broken... )
+stuffed cow ( a favorite toy. has 'moo' written on the tag )

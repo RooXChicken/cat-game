@@ -9,6 +9,7 @@ public class Game
     private static List<Entity> toSpawn = new List<Entity>();
     public static bool debug = false;
     public static Random random = new Random();
+    public static SpawnManager spawnManager = new SpawnManager(6);
 
     public static double GAME_SPEED = 1.0;
     private double physicsTickRate = 1/120.0;
@@ -23,15 +24,25 @@ public class Game
     private TextBox textBox;
     private Text phaseText;
 
+    private List<Vector2d> possibleSpawns;
+
     private int t = 0;
 
     public Game(RenderWindow window)
     {
+        possibleSpawns = new List<Vector2d>();
+
+        possibleSpawns.Add(new Vector2d(32, 100));
+        possibleSpawns.Add(new Vector2d(32, 120));
+        possibleSpawns.Add(new Vector2d(32, 140));
+        possibleSpawns.Add(new Vector2d(32, 160));
+        possibleSpawns.Add(new Vector2d(32, 180));
+        possibleSpawns.Add(new Vector2d(32, 280));
+        possibleSpawns.Add(new Vector2d(32, 300));
+
         particles = new ParticleArray(window.renderer, "assets/sprites/particles.png");
 
-        // crosshair = new Sprite("assets/sprites/crosshair.png");
-        // crosshair.offset = new Vector2d(-crosshair.textureBounds.w/2.0, -crosshair.textureBounds.h/2.0);
-        tilemap = new Sprite("assets/sprites/tiles/untitled.png");
+        tilemap = new Sprite("assets/sprites/room.png");
         bossbarOutline = new Sprite("assets/sprites/gui/bossbarOutline.png");
         bossbarOutline.position = new Vector2d(140, 318);
 
@@ -46,28 +57,12 @@ public class Game
         phaseText = new Text(window.renderer, "Scavenge Phase", RenderWindow.font, Color.WHITE);
         spawnEntity(new ParticleRenderEntity(particles));
 
-        spawnEntity(new Player(0, new Vector2d(35, 150)));
-        //spawnEntity(new Player(1, new Vector2d(200, 400)));
-        spawnEntity(new Cat(new Vector2d(100, 200)));
-        spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));
-        spawnEntity(new CollidableDecor("assets/sprites/decor/table.png", new Vector2d(106, 150)));
-        spawnEntity(new CollidableDecor("assets/sprites/decor/couch.png", new Vector2d(32, 150)));
-        
-        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_chair.png", new Vector2d(36, 338)));
-        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_table.png", new Vector2d(62, 338)));
-        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_chair.png", new Vector2d(102, 338), null, true));
-
-        spawnEntity(new StorageCabinet(new Vector2d(32, 220), new WeaponPickup(new Vector2d(44, 220), Weapon.fromID(1))));
-        spawnEntity(new StorageCabinet(new Vector2d(32, 240), new WeaponPickup(new Vector2d(44, 240), Weapon.fromID(2))));
-        spawnEntity(new StorageCabinet(new Vector2d(32, 260), new WeaponPickup(new Vector2d(44, 260), Weapon.fromID(3))));
-        spawnEntity(new StorageCabinet(new Vector2d(32, 280), new WeaponPickup(new Vector2d(44, 280), Weapon.fromID(4))));
-        spawnEntity(new StorageCabinet(new Vector2d(32, 300), new WeaponPickup(new Vector2d(44, 300), Weapon.fromID(6))));
-        // spawnEntity(new CollidableDecor("assets/sprites/decor/storage.png", new Vector2d(32, 214)));
-        // spawnEntity(new CollidableDecor("assets/sprites/decor/storage.png", new Vector2d(32, 242)));
-        //spawnEntity(new StorageCabinet("assets/sprites/decor/storage.png", new Vector2d(32, 214), ));
-
         spawnEntity(new SolidWall(new Vector2d(0, 16), new Vector2d(30, 1024)));
-        spawnEntity(new SolidWall(new Vector2d(274, 16), new Vector2d(30, 1024)));
+        spawnEntity(new SolidWall(new Vector2d(274, 16), new Vector2d(30, 372)));
+        spawnEntity(new SolidWall(new Vector2d(274, 428), new Vector2d(30, 372)));
+
+        spawnEntity(new SolidWall(new Vector2d(612, 16), new Vector2d(30, 1024)));
+        spawnEntity(new SolidWall(new Vector2d(274, 508), new Vector2d(512, 30)));
 
         spawnEntity(new SolidWall(new Vector2d(0, 0), new Vector2d(1024, 88)));
         spawnEntity(new SolidWall(new Vector2d(0, 620), new Vector2d(1024, 16)));
@@ -75,6 +70,31 @@ public class Game
         spawnEntity(new SolidWall(new Vector2d(146, 398), new Vector2d(14, 116), 11));
         spawnEntity(new SolidWall(new Vector2d(30, 398), new Vector2d(14, 256), 11));
         spawnEntity(new SolidWall(new Vector2d(0, 398), new Vector2d(160, 16), 11));
+
+        spawnEntity(new Player(0, new Vector2d(35, 150), 0));
+
+        spawnEntity(new Cat(new Vector2d(100, 200)));
+        spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/table.png", new Vector2d(72, 220)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/couch.png", new Vector2d(32, 212)));
+        
+        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_chair.png", new Vector2d(36, 338)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_table.png", new Vector2d(62, 338)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/dining_chair.png", new Vector2d(102, 338), null, true));
+
+        spawnEntity(new CollidableDecor("assets/sprites/decor/bella_desk.png", new Vector2d(205, 100)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/gavin_desk.png", new Vector2d(248, 153)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/gavin_chair.png", new Vector2d(224, 153)));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/tv_set.png", new Vector2d(251, 202)));
+
+        Hitbox bookshelfHitbox = new Hitbox(new Vector2d(89, 30));
+        bookshelfHitbox.offset = new Vector2d(0, 28);
+        //bookshelfHitbox.setPosition(new Vector2d(0, 0));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/bella_bookshelf.png", new Vector2d(308, 68), bookshelfHitbox));
+        spawnEntity(new CollidableDecor("assets/sprites/decor/rug.png", new Vector2d(318, 124), new Hitbox(new Vector2d(0, 0)), false, -1));
+
+        foreach(Vector2d location in possibleSpawns)
+            spawnEntity(new StorageCabinet(location));
 
         tick();
         phaseText.position = new Vector2d(260, 4);

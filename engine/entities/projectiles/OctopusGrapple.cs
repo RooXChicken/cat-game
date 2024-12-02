@@ -8,6 +8,7 @@ class OctopusGrapple : Projectile
     {
         player = _player;
         player.grappleOut = true;
+        collision = 12;
         bullet.rotation = Math.Abs(Math.Atan2(direction.x, direction.y)-3) * 60;
     }
 
@@ -37,7 +38,7 @@ class OctopusGrapple : Projectile
 
     public override bool genericCollision(Entity entity)
     {
-        if(entity.collision == 4 || entity.collision == 6)
+        if(entity.collision == 4 || entity.collision == 6 || entity.collision == 10)
         {
             velocity = new Vector2d(0, 0);
             killOnStop = false;

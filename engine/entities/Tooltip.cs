@@ -8,6 +8,7 @@ public class Tooltip : Entity
     public bool active = false;
     private Text text;
     public Vector2d tooltipPosition;
+    private nint renderer;
 
     public Tooltip(Vector2d position, string _name, string _desc, bool shadow = true, string path = "assets/sprites/gui/tooltip.png") : base(position, 0)
     {
@@ -16,11 +17,18 @@ public class Tooltip : Entity
 
         tooltip = new Sprite(path);
         tooltip.color = new Color(255, 255, 255, 196);
-        text = new Text(Sprite.renderer, name + "\n" + desc, RenderWindow.gameFont, tooltip.color);
+        text = new Text(Sprite.renderer, "", RenderWindow.gameFont, tooltip.color);
+        redrawTooltip();
 
         drawOrder = 5;
         tooltipPosition = position;
         //text.renderedText.size = new Vector2d(0.25, 0.25);
+    }
+
+    public void redrawTooltip()
+    {
+        text.text = name + "\n" + desc;
+        text.renderText(Sprite.renderer);
     }
 
     public override void draw(RenderWindow window, float alpha)

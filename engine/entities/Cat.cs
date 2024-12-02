@@ -47,6 +47,8 @@ public class Cat : Entity
         dealtDamage = 1.2;
 
         speeds = new double[] { 0.6, 1, 1.6 };
+
+        Game.spawnEntity(new PlayerShadow(this));
     }
 
     public override void tick()
@@ -80,8 +82,15 @@ public class Cat : Entity
             case -1: state_peace(); break;
         }
 
+        Vector2d _target = target;
+
+        if(target.x > 274 && getRawPosition().x < 274)
+            _target = new Vector2d(280, 398);
+        if(target.x < 274 && getRawPosition().x > 274)
+            _target = new Vector2d(270, 398);
+
         if(state >= 0)
-            velocity = target.distanceSquared(getRawPosition()) > 1 ? target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[state] * (catnipTimer > 0 ? 1.35 : 1))) : new Vector2d(0, 0);
+            velocity = _target.distanceSquared(getRawPosition()) > 1 ? _target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[state] * (catnipTimer > 0 ? 1.35 : 1))) : new Vector2d(0, 0);
 
         //state = 2;
         basicCollision();

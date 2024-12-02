@@ -1,6 +1,6 @@
 public class Entity : IComparable<Entity>
 {
-    protected Drawable drawable;
+    public Drawable drawable;
     public Hitbox hitbox { get; protected set; }
 
     private Vector2d lastPos;
@@ -40,6 +40,8 @@ public class Entity : IComparable<Entity>
         drawOrder = 0;
         collision = _collision;
         ignored = new List<byte>();
+        ignored.Add(12);
+
         pushForce = 4;
         dealtDamage = 0;
         damageable = false;

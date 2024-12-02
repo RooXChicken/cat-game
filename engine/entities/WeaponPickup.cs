@@ -17,6 +17,13 @@ public class WeaponPickup : Entity
         Game.spawnEntity(shadow);
     }
 
+    public override void teleport(Vector2d _position, bool lerp = false)
+    {
+        base.teleport(_position, lerp);
+        if(shadow != null)
+            shadow.teleport(_position, lerp);
+    }
+
     public override void tick()
     {
         base.tick();
