@@ -26,6 +26,8 @@ public class SpawnManager
         available.Add(new Item(16, UsableItem.fromID(16), true, false)); //banana bread
         available.Add(new Item(17, UsableItem.fromID(17), true, false)); //new world
         available.Add(new Item(18, UsableItem.fromID(18), false, true)); //qtip rifle
+        available.Add(new Item(19, UsableItem.fromID(19), true, false)); //peanut butter apple
+        available.Add(new Item(20, UsableItem.fromID(20), true, false)); //polaroid
 
         foreach(Item item in available)
             master.Add(item.clone());
@@ -87,7 +89,7 @@ public class SpawnManager
         // custom item behavior
         switch(item.id)
         {
-            case 12: item.pickup = new WornToyCat(player, true); break;
+            case 12: if(player.type == 1) return getItem(player); item.pickup = new WornToyCat(player, true); break;
             default: break;
         }
 

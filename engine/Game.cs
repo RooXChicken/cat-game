@@ -45,6 +45,11 @@ public class Game
         possibleSpawns.Add(new Vector2d(256, 322), true);
         possibleSpawns.Add(new Vector2d(256, 344), true);
 
+        possibleSpawns.Add(new Vector2d(256, 512), true);
+        possibleSpawns.Add(new Vector2d(256, 534), true);
+        possibleSpawns.Add(new Vector2d(256, 556), true);
+        possibleSpawns.Add(new Vector2d(256, 578), true);
+
         particles = new ParticleArray(window.renderer, "assets/sprites/particles.png");
 
         tilemap = new Sprite("assets/sprites/room.png");
@@ -77,7 +82,7 @@ public class Game
         spawnEntity(new SolidWall(new Vector2d(0, 398), new Vector2d(160, 16), 11));
 
         spawnEntity(new Player(0, new Vector2d(35, 218), 0));
-        spawnEntity(new Player(1, new Vector2d(35, 242), 0));
+        spawnEntity(new Player(1, new Vector2d(35, 242), 1));
 
         spawnEntity(new Cat(new Vector2d(100, 200)));
         spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));

@@ -129,8 +129,7 @@ public class Player : LivingEntity
         lastCrosshairPosition = getCenter();
 
         Game.spawnEntity(new PlayerShadow(this));
-
-        items.Add(UsableItem.fromID(14));
+        items.Add(UsableItem.fromID(20));
     }
 
     public void moveFromCouch() { teleport(getRawPosition() + new Vector2d(14, 0)); }

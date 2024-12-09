@@ -22,7 +22,7 @@ public class Vector2d
     }
 
     public double distanceSquared(Vector2d other) { return Math.Sqrt(Math.Pow(x - other.x, 2) + Math.Pow(y - other.y, 2)); }
-    public double distance(Vector2d other) { return (x - other.x) + (y - other.y); }
+    public double distance(Vector2d other) { return Math.Abs((x - other.x) + (y - other.y)); }
 
     public Vector2d normalize()
     {

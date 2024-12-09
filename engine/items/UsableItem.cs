@@ -50,6 +50,8 @@ public class UsableItem
             case 16: return new BananaBread();
             case 17: return new NewWorld();
             case 18: return new QTipRifle();
+            case 19: return new PeanutButterApple();
+            case 20: return new Polaroid();
         }
 
         return new UsableItem();

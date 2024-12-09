@@ -6,7 +6,7 @@ https://blog.rubenwardy.com/2023/01/24/using_sdl_gamecontroller/
 gavin is wearing a beanie
 
 neccesary to FINISH THE GAME IN TIME:
-add gavin (sprites, and multi player support)
+[x] add gavin (sprites, and multi player support)
 add other 3 cats
 add tutorial and main menu
 
@@ -47,7 +47,7 @@ laser pointer ( limited battery. cat will follow the cursor (where the laser poi
 [x] boba ( one time use. heals the player 20hp ) 0 delay 0 dmg
 [x] coffee ( makes you run faster for a period of time ) 20s
 karaoke machine ( if used by bella it makes the cats angrier. if used by gavin it makes the cats calmer ) 8s
-peanut butter apple ( heals the player for 5hp )
+[x] peanut butter apple ( heals the player for 5hp )
 [x] mocchi ( heals the player for 8hp )
 [x] lucky bag ( gives you 3 random positive items )
 dying plant ( if you can water the plant enough (random intervals to distract), it will give both players a permanent damage bonus )
@@ -60,7 +60,7 @@ if found by gavin, it will heal 6hp
 once found by gavin, it can spawn eaten halloween candy
 if found by bella, it's nothing but wrappers
 
-polaroid: ( if used when both players are nearby, it will heal them both ) 4hp
+[x] polaroid: ( if used when both players are nearby, it will heal them both ) 4hp
 [x] new world ( will remove all negative effects ) tooltip: "this button was pressed a lot"
 [x] banana bread ( multi use healing item ) 2hp x 4 tooltip: "baked with the secret ingredient of motherly love"
 [x] chalk ( increases friction, allowing for faster acceleration ) 30s
