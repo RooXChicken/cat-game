@@ -10,10 +10,15 @@ public class StorageInteractable : Interactable
     {
         Entity spawn = Game.spawnManager.getSpawn(player);
         cabinet.sprite = new Sprite("assets/sprites/decor/storage_open.png");
+        if(cabinet.flip)
+        {
+            cabinet.sprite.size.x *= -1;
+            cabinet.sprite.offset = new Vector2d(-4, 0);
+        }
 
         if(spawn != null)
         {
-            spawn.teleport(cabinet.getRawPosition() + (((Sprite)cabinet.drawable).size.x == -1 ? new Vector2d(-12, 0) : new Vector2d(12, 0)));
+            spawn.teleport(cabinet.getRawPosition() + (cabinet.flip ? new Vector2d(-24, 0) : new Vector2d(12, 0)));
             Game.spawnEntity(spawn);
             base.interact(player);
         }

@@ -25,7 +25,7 @@ public class RenderWindow
 
     public RenderWindow(uint _gWidth, uint _gHeight, uint _rWidth, uint _rHeight, string _name)
     {
-        if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO) < 0)
+        if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0)
             Console.WriteLine("Error initializing SDL! " + SDL.SDL_GetError());
         if(SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG) == 0)
             Console.WriteLine("Error initializing SDL_image! " + SDL_image.IMG_GetError());
@@ -53,6 +53,7 @@ public class RenderWindow
         name = _name;
 
         window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)rWidth, (int)rHeight, _flags);
+        SDL_ShowCursor(SDL_DISABLE);
     }
 
     private void initRenderer(uint _gWidth, uint _gHeight)
@@ -60,7 +61,7 @@ public class RenderWindow
         gWidth = _gWidth;
         gHeight = _gHeight;
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
         if(renderer == IntPtr.Zero)
             Console.WriteLine("Error creating SDL renderer! " + SDL.SDL_GetError());
 
@@ -108,12 +109,13 @@ public class RenderWindow
                 case SDL_EventType.SDL_KEYUP: Input._keyUp(e); break;
 
                 case SDL_EventType.SDL_MOUSEMOTION: Input._mouseMotion(e); break;
+                case SDL_EventType.SDL_MOUSEWHEEL: Input._mouseWheel(e); break;
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN: Input._mouseDown(e); break;
                 case SDL_EventType.SDL_MOUSEBUTTONUP: Input._mouseUp(e); break;
 
-                case SDL_EventType.SDL_JOYAXISMOTION: Input._joyMotion(e); break;
-                case SDL_EventType.SDL_JOYBUTTONDOWN: Input._joyDown(e); break;
-                case SDL_EventType.SDL_JOYBUTTONUP: Input._joyUp(e); break;
+                // case SDL_EventType.SDL_JOYAXISMOTION: Input._joyMotion(e); break;
+                case SDL_EventType.SDL_CONTROLLERBUTTONDOWN: Input._joyDown(e); break;
+                case SDL_EventType.SDL_CONTROLLERBUTTONUP: Input._joyUp(e); break;
 
                 //case SDL_EventType.SDL_AUDIODEVICEADDED: registerSound(); break;
             }

@@ -1,16 +1,26 @@
 using System.Runtime.CompilerServices;
 
-public class WeaponPickup : Entity
+public class ItemPickup : Entity
 {
     private Sprite sprite;
-    public WeaponInteractable interactable;
+    public ItemInteractable interactable;
     public PlayerShadow shadow;
+    private UsableItem item;
 
-    public WeaponPickup(Vector2d position, Weapon _weapon) : base(position, 9)
+    public ItemPickup(UsableItem _item) : base(new Vector2d(0, 0), 9)
     {
-        interactable = new WeaponInteractable(position, _weapon);
-        sprite = _weapon.sprite;
+        item = _item;
+        sprite = item.sprite.clone();
         drawOrder = 1;
+    }
+
+    public override void onSpawn()
+    {
+        base.onSpawn();
+        if(interactable != null)
+            return;
+            
+        interactable = new ItemInteractable(getRawPosition(), item);
 
         shadow = new PlayerShadow(this);
         shadow.shadow.offset = new Vector2d(5, 12);
@@ -22,6 +32,8 @@ public class WeaponPickup : Entity
         base.teleport(_position, lerp);
         if(shadow != null)
             shadow.teleport(_position, lerp);
+        if(interactable != null)
+            interactable.position = _position;
     }
 
     public override void tick()

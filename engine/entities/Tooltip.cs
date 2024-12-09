@@ -28,7 +28,6 @@ public class Tooltip : Entity
     public void redrawTooltip()
     {
         text.text = name + "\n" + desc;
-        text.renderText(Sprite.renderer);
     }
 
     public override void draw(RenderWindow window, float alpha)

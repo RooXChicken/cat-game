@@ -3,7 +3,7 @@ using static SDL2.SDL;
 
 public class ParticleArray : Drawable
 {
-    public static readonly int PARTICLE_COUNT = 3;
+    public static readonly int PARTICLE_COUNT = 5;
     private Texture texture;
     public List<Particle> particles;
 

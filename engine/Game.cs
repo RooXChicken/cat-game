@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Security;
+using Microsoft.Win32.SafeHandles;
 using SDL2;
 
 public class Game
@@ -9,7 +10,7 @@ public class Game
     private static List<Entity> toSpawn = new List<Entity>();
     public static bool debug = false;
     public static Random random = new Random();
-    public static SpawnManager spawnManager = new SpawnManager(6);
+    public static SpawnManager spawnManager = new SpawnManager();
 
     public static double GAME_SPEED = 1.0;
     private double physicsTickRate = 1/120.0;
@@ -24,21 +25,25 @@ public class Game
     private TextBox textBox;
     private Text phaseText;
 
-    private List<Vector2d> possibleSpawns;
+    private Dictionary<Vector2d, bool> possibleSpawns;
 
     private int t = 0;
 
     public Game(RenderWindow window)
     {
-        possibleSpawns = new List<Vector2d>();
+        possibleSpawns = new Dictionary<Vector2d, bool>();
 
-        possibleSpawns.Add(new Vector2d(32, 100));
-        possibleSpawns.Add(new Vector2d(32, 120));
-        possibleSpawns.Add(new Vector2d(32, 140));
-        possibleSpawns.Add(new Vector2d(32, 160));
-        possibleSpawns.Add(new Vector2d(32, 180));
-        possibleSpawns.Add(new Vector2d(32, 280));
-        possibleSpawns.Add(new Vector2d(32, 300));
+        possibleSpawns.Add(new Vector2d(32, 100), false);
+        possibleSpawns.Add(new Vector2d(32, 120), false);
+        possibleSpawns.Add(new Vector2d(32, 140), false);
+        possibleSpawns.Add(new Vector2d(32, 160), false);
+        possibleSpawns.Add(new Vector2d(32, 180), false);
+        possibleSpawns.Add(new Vector2d(32, 280), false);
+        possibleSpawns.Add(new Vector2d(32, 300), false);
+
+        possibleSpawns.Add(new Vector2d(256, 300), true);
+        possibleSpawns.Add(new Vector2d(256, 322), true);
+        possibleSpawns.Add(new Vector2d(256, 344), true);
 
         particles = new ParticleArray(window.renderer, "assets/sprites/particles.png");
 
@@ -71,7 +76,8 @@ public class Game
         spawnEntity(new SolidWall(new Vector2d(30, 398), new Vector2d(14, 256), 11));
         spawnEntity(new SolidWall(new Vector2d(0, 398), new Vector2d(160, 16), 11));
 
-        spawnEntity(new Player(0, new Vector2d(35, 150), 0));
+        spawnEntity(new Player(0, new Vector2d(35, 218), 0));
+        spawnEntity(new Player(1, new Vector2d(35, 242), 0));
 
         spawnEntity(new Cat(new Vector2d(100, 200)));
         spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));
@@ -93,12 +99,17 @@ public class Game
         spawnEntity(new CollidableDecor("assets/sprites/decor/bella_bookshelf.png", new Vector2d(308, 68), bookshelfHitbox));
         spawnEntity(new CollidableDecor("assets/sprites/decor/rug.png", new Vector2d(318, 124), new Hitbox(new Vector2d(0, 0)), false, -1));
 
-        foreach(Vector2d location in possibleSpawns)
-            spawnEntity(new StorageCabinet(location));
+        ItemPickup _treatPistol = new ItemPickup(Weapon.fromID(2));
+        _treatPistol.teleport(new Vector2d(130, 164));
+        _treatPistol.onSpawn();
+        spawnEntity(_treatPistol);
+
+        foreach(KeyValuePair<Vector2d, bool> location in possibleSpawns)
+            spawnEntity(new StorageCabinet(location.Key, location.Value));
 
         tick();
         phaseText.position = new Vector2d(260, 4);
-        t = 3500;
+        t = 0;
         
         textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!" }, window.renderer, RenderWindow.font);
     }
@@ -121,22 +132,31 @@ public class Game
         {
             textBox.tick();
             Input.update();
-            textBox.kill();
+            //textBox.kill();
 
             if(textBox.remove)
-                entities[1][0].teleport(entities[1][0].getRawPosition() + new Vector2d(20, 0));
+            {
+                ((Player)entities[1][0]).moveFromCouch();
+                ((Player)entities[1][1]).moveFromCouch();
+            }
             return;
         }
 
-        if(++t < 3600)
-            phaseText.text = "Scavenge Phase\n     " + (30-t/120) + "s";
-        else if(t < 3840)
+        if(++t < 7200)
+            phaseText.text = "Scavenge Phase\n     " + (60-t/120) + "s";
+        else if(t < 7440)
             phaseText.text = "Attack Phase!";
         else
             phaseText.text = "";
         
-        if(t == 3600)
+        if(t == 7200)
             ((Cat)Game.entities[2][0]).phaseDuration = 0;
+
+        //disable activeness of all tooltips
+        foreach(ItemPickup _interactable in entities[9])
+            _interactable.interactable.tooltip.active = false;
+        foreach(StorageCabinet _interactable in entities[10])
+            _interactable.interactable.tooltip.active = false;
 
         List<Entity> removedEntities = new List<Entity>();
         foreach(Entity entity in entities[0])
@@ -154,11 +174,14 @@ public class Game
             entities[0].Remove(entity);
         }
 
-        foreach(Entity spawn in toSpawn)
-        {
-            if(spawn.collision != 0)
-            entities[spawn.collision].Add(spawn);
+        List<Entity> _toSpawn = [.. toSpawn];
+        toSpawn.Clear();
 
+        foreach(Entity spawn in _toSpawn)
+        {
+            spawn.onSpawn();
+            if(spawn.collision != 0)
+                entities[spawn.collision].Add(spawn);
             entities[0].Add(spawn);
         }
 
@@ -177,14 +200,28 @@ public class Game
         if(Input.isJustPressed(SDL.SDL_Keycode.SDLK_F3))
             debug = !debug;
 
-        toSpawn.Clear();
         Input.update();
     }
 
     public void render(RenderWindow window)
     {
         float alpha = (float)(accumulator/physicsTickRate);
-        window.cameraCenter = (entities[1][0].getBlendPosition(alpha)*2)/2 - new Vector2d(window.gWidth/2.0, window.gHeight/2.0) + entities[1][0].hitbox.size/2;
+
+        Vector2d centerPoint = new Vector2d(0, 0);
+        int alivePlayers = 0;
+        if(((LivingEntity)entities[1][0]).health > 0)
+        {
+            centerPoint += entities[1][0].getBlendPosition(alpha);
+            alivePlayers++;
+        }
+        if(((LivingEntity)entities[1][1]).health > 0)
+        {
+            centerPoint += entities[1][1].getBlendPosition(alpha);
+            alivePlayers++;
+        }
+        
+        if(alivePlayers > 0)
+            window.cameraCenter = centerPoint/alivePlayers - new Vector2d(window.gWidth/2.0, window.gHeight/2.0) + entities[1][0].hitbox.size/2;
 
         window.draw(tilemap);
 
@@ -202,7 +239,6 @@ public class Game
         window.drawNC(new Rectangle(new Vector2d(146, 324), new Vector2d(348 * (1-catHealth), 28), new Color(61, 140, 64)));
         window.drawNC(bossbarOutline);
 
-        phaseText.renderText(window.renderer);
         if(t > 0)
             window.drawNC(phaseText);
 

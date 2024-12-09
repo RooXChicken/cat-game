@@ -5,6 +5,11 @@ https://blog.rubenwardy.com/2023/01/24/using_sdl_gamecontroller/
 
 gavin is wearing a beanie
 
+neccesary to FINISH THE GAME IN TIME:
+add gavin (sprites, and multi player support)
+add other 3 cats
+add tutorial and main menu
+
 game ideas:
 
 two phases of game loop:
@@ -40,14 +45,14 @@ cucumber ( cat will avoid going near here ) 0 delay 0 dmg
 plant ( acts as shield. the cat will damage the plant instead of you for it's health ) 4hp
 laser pointer ( limited battery. cat will follow the cursor (where the laser pointer is) ) 0 delay 0 dmg
 [x] boba ( one time use. heals the player 20hp ) 0 delay 0 dmg
-coffee ( makes you run faster for a period of time ) 20s
+[x] coffee ( makes you run faster for a period of time ) 20s
 karaoke machine ( if used by bella it makes the cats angrier. if used by gavin it makes the cats calmer ) 8s
 peanut butter apple ( heals the player for 5hp )
-mocchi ( heals the player for 8hp )
-lucky bag ( gives you 3 random positive items )
+[x] mocchi ( heals the player for 8hp )
+[x] lucky bag ( gives you 3 random positive items )
 dying plant ( if you can water the plant enough (random intervals to distract), it will give both players a permanent damage bonus )
 toy bird ( will launch where thrown, distracting the cat until it lands on the floor. ) 120 delay 0 dmg
-loaf of bread ( makes the cat loaf on the floor, pausing it ) 5s
+[x] loaf of bread ( makes the cat loaf on the floor, pausing it ) 5s
 
 bella's lost halloween candy:
 can only be found by gavin.
@@ -56,23 +61,23 @@ once found by gavin, it can spawn eaten halloween candy
 if found by bella, it's nothing but wrappers
 
 polaroid: ( if used when both players are nearby, it will heal them both ) 4hp
-new world ( will remove all negative effects ) tooltip: "this button was pressed a lot"
-banana bread ( multi use healing item ) 2hp x 4 tooltip: "baked with the secret ingredient of motherly love"
-chalk ( increases friction, allowing for faster acceleration ) 30s
-pineapple ( heals bella for 1hp, heals gavin for 6hp ) tooltip: "bella's 'favorite' item"
+[x] new world ( will remove all negative effects ) tooltip: "this button was pressed a lot"
+[x] banana bread ( multi use healing item ) 2hp x 4 tooltip: "baked with the secret ingredient of motherly love"
+[x] chalk ( increases friction, allowing for faster acceleration ) 30s
+[x] pineapple ( heals bella for 1hp, heals gavin for 6hp ) tooltip: "bella's 'favorite' item"
 
 negative item ideas:
 
-cinammon ( leaves a trail of cinammon following you. makes the ground slipperier ) 10s
+[x] cinammon ( leaves a trail of cinammon following you. makes the ground slipperier ) 10s
 phone ( if used by bella, she makes a short video on music.ly, being paused. if used by gavin, he goes on social media, being paused ) requires the other player to interact with them to cancel
 pumpkin spice ( reduces the effectiveness of all healing items )
 turnip ( duplicates every 8 seconds. will heal the cat if touched ) 1hp (-1hp for player)
 IDEA: japanese dictionary ( switches the language to japanese. very hard and might not do ) 30s
 rice porridge ( slows the player down ) 12s 3hp
-clothing tag ( makes movement jittery ) 8s tooltip: "'BUGS YOU!!'"
+[x] clothing tag ( makes movement jittery ) 8s tooltip: "'BUGS YOU!!'"
 raw fish ( cat targets the player and is faster ) 24s
 warrior cat book ( if picked up by bella, it forces gavin to read the book with her, halting progression ) 5s
-worn toy cat ( makes the next 3 storage containers pick  ) tooltip: "The gift that keeps on giving!"
+[x] worn toy cat ( makes the next 3 storage containers pick the cat ) tooltip: "The gift that keeps on giving!"
 
 collectables:
 

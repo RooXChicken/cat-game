@@ -8,16 +8,10 @@ public class Entity : IComparable<Entity>
 
     public Vector2d velocity;
 
-    public double maxHealth { get; protected set; }
-    public double health { get; protected set; }
-    public bool damageable { get; protected set; }
-
     public byte collision { get; protected set; }
-    public double dealtDamage { get; protected set; }
     protected List<byte> ignored;
     public bool pushable { get; protected set; }
     public bool solid { get; protected set; }
-    public double pushForce { get; protected set; }
 
     public bool remove { get; private set; }
     public int drawOrder { get; protected set; }
@@ -33,19 +27,12 @@ public class Entity : IComparable<Entity>
         velocity = new Vector2d(0, 0);
         hitbox = _hitbox;
 
-        maxHealth = 1;
-        health = 1;
-
         pushable = false;
         drawOrder = 0;
         collision = _collision;
         ignored = new List<byte>();
         ignored.Add(12);
-
-        pushForce = 4;
-        dealtDamage = 0;
-        damageable = false;
-
+        
         teleport(_position);
     }
 
@@ -56,11 +43,12 @@ public class Entity : IComparable<Entity>
     public Vector2d getVelocity() { return velocity; }
 
     public void addVelocity() { setPosition(nextPos + velocity); }
-    public void setPosition(Vector2d _position) { lastPos = new Vector2d(nextPos.x, nextPos.y); nextPos = _position; }
+    public void setPosition(Vector2d _position) { lastPos = new Vector2d(nextPos.x, nextPos.y); nextPos = _position; if(Math.Abs(velocity.x) + Math.Abs(velocity.y) < 0.02) velocity = new Vector2d(0, 0); }
 
-    public virtual void damage(double damage) { health -= damage; }
     public void kill() { remove = true; onKill(); }
     public virtual void onKill() { }
+
+    public virtual void onSpawn() { }
 
     public virtual void tick() { if(hitbox != null) hitbox.setPosition(getRawPosition()); }
     protected bool basicCollision()
@@ -94,11 +82,11 @@ public class Entity : IComparable<Entity>
     }
 
     public virtual bool genericCollision(Entity entity) { return !ignored.Contains(entity.collision); }
-    public virtual void basicRightCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = -(hitbox.getPosition().x - collision.right); /* setPosition(new Vector2d(collision.right, getRawPosition().y));*/}
-    public virtual void basicLeftCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.x = velocity.x/pushForce; velocity.x = -(hitbox.getPosition().x - collision.left); /* setPosition(new Vector2d(collision.left, getRawPosition().y));*/}
+    public virtual void basicRightCollision(Collision collision, Entity entity) { velocity.x = -(hitbox.getPosition().x - collision.right); }
+    public virtual void basicLeftCollision(Collision collision, Entity entity) { velocity.x = -(hitbox.getPosition().x - collision.left); }
 
-    public virtual void basicTopCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = -(hitbox.getPosition().y - collision.top); /* setPosition(new Vector2d(getRawPosition().x, collision.top)); */}
-    public virtual void basicBottomCollision(Collision collision, Entity entity) { if(entity.pushable) entity.velocity.y = velocity.y/pushForce; velocity.y = -(hitbox.getPosition().y - collision.bottom); /* setPosition(new Vector2d(getRawPosition().x, collision.bottom));*/ }
+    public virtual void basicTopCollision(Collision collision, Entity entity) { velocity.y = -(hitbox.getPosition().y - collision.top); }
+    public virtual void basicBottomCollision(Collision collision, Entity entity) { velocity.y = -(hitbox.getPosition().y - collision.bottom); }
 
     public virtual void draw(RenderWindow window, float alpha)
     {       
@@ -114,7 +102,7 @@ public class Entity : IComparable<Entity>
         if(other == null) return 1;
 
         Entity entity = (Entity)other;
-        if(entity.drawOrder == drawOrder) return 0;
+        if(entity.drawOrder == drawOrder) return getRawPosition().y > entity.getRawPosition().y ? 1 : -1;
         if(entity.drawOrder > drawOrder) return -1;
         if(entity.drawOrder < drawOrder) return 1;
 

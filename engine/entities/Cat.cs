@@ -2,11 +2,12 @@ using System.Data.Common;
 using System.Runtime.InteropServices;
 using System.Security;
 
-public class Cat : Entity
+public class Cat : LivingEntity
 {
     private Sprite idle;
     private Sprite slide;
     private Sprite walk;
+    private Sprite loaf;
 
     private double anim = 0;
     private bool direction = true;
@@ -19,7 +20,6 @@ public class Cat : Entity
 
     private double[] speeds;
 
-    public int catnipTimer = 0;
     private int dashTime = 0;
 
     public Cat(Vector2d _position) : base(_position, 1, new Hitbox(new Vector2d(25,23)))
@@ -27,6 +27,7 @@ public class Cat : Entity
         idle = new Sprite("assets/sprites/cats/boba/bobaidle.png");
         slide = new Sprite("assets/sprites/cats/boba/bobaslide.png");
         walk = new Sprite("assets/sprites/cats/boba/bobawalk.png");
+        loaf = new Sprite("assets/sprites/cats/catloaf.png");
         idle.offset = new Vector2d(-4, -1);
         walk.offset = new Vector2d(-4, -1);
         walk.textureBounds.w = 32;
@@ -60,7 +61,7 @@ public class Cat : Entity
         {
             health = 0;
             state = -2;
-            catnipTimer = 0;
+            effects.Clear();
             return;
         }
 
@@ -90,13 +91,23 @@ public class Cat : Entity
             _target = new Vector2d(270, 398);
 
         if(state >= 0)
-            velocity = _target.distanceSquared(getRawPosition()) > 1 ? _target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[state] * (catnipTimer > 0 ? 1.35 : 1))) : new Vector2d(0, 0);
+            velocity = _target.distanceSquared(getRawPosition()) > 1 ? _target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[state] * (hasEffect(0) ? 1.35 : 1))) : new Vector2d(0, 0);
 
         //state = 2;
+        if(hasEffect(3))
+            velocity = new Vector2d(0, 0);
+        
         basicCollision();
         addVelocity();
 
-        anim += ((velocity.x)/16 + (velocity.y)/16) * (direction ? 1 : -1);
+        double animIncrement = Math.Abs(velocity.x/16) + Math.Abs(velocity.y/16);
+        if(velocity.x < 0 && direction == true)
+            animIncrement *= -1;
+        if(velocity.x > 0 && direction == false)
+            animIncrement *= -1;
+            
+        anim += animIncrement;
+        
         if(anim > 2)
             anim = 0;
         if(anim < 0)
@@ -117,6 +128,9 @@ public class Cat : Entity
 
         walk.textureBounds.x = (int)anim * 32;
 
+        if(hasEffect(3))
+            drawable = loaf;
+
         if(direction)
             ((Sprite)drawable).size.x = 1;
         else
@@ -125,10 +139,9 @@ public class Cat : Entity
         velocity.x *= 0.9;
         velocity.y *= 0.9;
 
-        if(catnipTimer > 0)
+        if(hasEffect(0))
         {
-            catnipTimer--;
-            if(catnipTimer % 4 == 0)
+            if(getEffect(0).timer % 4 == 0)
             {
                 CatnipParticle particle = new CatnipParticle(getRawPosition() + new Vector2d((Game.random.NextDouble()*16), (Game.random.NextDouble()*16)), false);
                 Game.spawnParticle(particle);
@@ -141,7 +154,7 @@ public class Cat : Entity
         if(state < 0)
             return;
             
-        base.damage(damage * (catnipTimer > 0 ? 1.35 : 1));
+        base.damage(damage * (hasEffect(0) ? 1.35 : 1));
     }
 
     private void state_peace()
@@ -191,14 +204,22 @@ public class Cat : Entity
     public override void draw(RenderWindow window, float alpha)
     {
         drawable.position = getBlendPosition(alpha);
-        if(state >= 0) { if(catnipTimer > 0) drawable.color = new Color(196, 255, 196); else drawable.color = Color.WHITE; }
+        if(state >= 0) { if(hasEffect(0)) drawable.color = new Color(196, 255, 196); else drawable.color = Color.WHITE; }
         window.draw(drawable);
+    }
+
+    public override bool genericCollision(Entity entity)
+    {
+        if(entity.collision == 4 && state == 1)
+            time = 0;
+            
+        return base.genericCollision(entity);
     }
 
     public int getTargettedPlayer()
     {
-        if(Game.entities[1][targettedPlayer].health <= 0)
-            return targettedPlayer == 0 ? 0 : 0; //CHANGEME
+        if(((Player)Game.entities[1][targettedPlayer]).health <= 0)
+            return targettedPlayer == 0 ? 1 : 0; //CHANGEME
         
         return targettedPlayer;
     }

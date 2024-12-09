@@ -11,6 +11,7 @@ public class Particle
 
     public int lifetime = 0;
     public bool fadeout = false;
+    protected bool gravity;
 
     public bool remove { get; protected set; }
 
@@ -23,6 +24,7 @@ public class Particle
         uS = _uS;
 
         id = 0;
+        gravity = true;
 
         lifetime = _lifetime;
         fadeout = _fadeout;
@@ -40,7 +42,8 @@ public class Particle
             return;
         }
 
-        velocity.y += 0.02;
+        if(gravity)
+            velocity.y += 0.02;
 
         position += velocity;
         velocity *= 0.93;

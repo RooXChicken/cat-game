@@ -4,7 +4,7 @@ public class CatnipLauncher : Weapon
     {
         sprite = new Sprite("assets/sprites/weapons/catnip_launcher.png");
         sprite.offset = new Vector2d(-2, 5);
-        fireSound = new SoundEffect("assets/sounds/catnip_launcher_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/catnip_launcher_shoot.wav");
         sprite.origin -= new Vector2d(-2, 0);
         id = 1;
 

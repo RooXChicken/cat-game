@@ -1,5 +1,5 @@
 
-class Projectile : Entity
+class Projectile : LivingEntity
 {
     protected Vector2d direction;
     protected Sprite bullet;
@@ -18,7 +18,7 @@ class Projectile : Entity
         bullet.origin = new Vector2d(bullet.textureBounds.w, bullet.textureBounds.h)/2;
 
         direction = _direction;
-        bullet.rotation = Math.Abs(Math.Atan2(direction.x, direction.y)-3) * 60 - 90;
+        bullet.rotation = Math.Abs(Math.Atan2(direction.x, direction.y)-3) * 60;
 
         hitbox = new Hitbox(new Vector2d(bullet.textureBounds.w, bullet.textureBounds.h));
         velocity = direction * speed;
@@ -51,7 +51,14 @@ class Projectile : Entity
             kill();
     }
 
-    public virtual bool onHit(Entity entity) { if(entity.damageable) entity.damage(damage); kill(); return true; }
+    public virtual bool onHit(Entity entity)
+    {
+        if((entity is LivingEntity) && ((LivingEntity)entity).damageable)
+            ((LivingEntity)entity).damage(damage);
+            
+        kill();
+        return true;
+    }
 
     public override bool genericCollision(Entity entity)
     {

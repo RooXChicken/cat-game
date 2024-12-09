@@ -1,26 +1,23 @@
 
-public class BobaTea : Weapon
+public class Mochi : UsableItem
 {
-    public BobaTea() : base()
+    public Mochi() : base()
     {
-        sprite = new Sprite("assets/sprites/items/boba_tea.png");
+        sprite = new Sprite("assets/sprites/items/mochi.png");
         sprite.offset = new Vector2d(8, 5);
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        fireSound = new SoundEffect("assets/sounds/gun_shoot.wav");
-        id = 6;
+        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        id = 15;
 
-        name = "Boba Tea";
-        desc = "A delectable treat\nthat heals the player!\n\n+5 hp\n0 use time";
-
-        useTime = 0;
-        damage = 0;
+        name = "Mochi";
+        desc = "A tasty treat\n\n+6 hp";
     }
 
     public override bool use(Player player, Vector2d direction, Vector2d position)
     {
-        player.heal(5);
+        player.heal(6);
         destroy = true;
 
         for(int i = 0; i < 20; i++)

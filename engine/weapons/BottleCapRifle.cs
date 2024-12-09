@@ -5,7 +5,7 @@ public class BottleCapRifle : Weapon
     {
         sprite = new Sprite("assets/sprites/weapons/bottle_cap_rifle.png");
         sprite.offset = new Vector2d(-2, 5);
-        fireSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
         sprite.origin -= new Vector2d(0, 0);
         id = 3;
 

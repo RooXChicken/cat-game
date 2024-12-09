@@ -8,7 +8,7 @@ public class TreatPistol : Weapon
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        fireSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
         id = 2;
 
         name = "Treat Pistol";

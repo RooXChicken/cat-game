@@ -16,7 +16,7 @@ public class CatnipParticle : Particle
 
         if(cat != null && cat.getRawPosition().distanceSquared(position) < 14)
         {
-            cat.catnipTimer += 18;
+            cat.addEffect(new Effect(0, 18, false), true);
             remove = true;
         }
     }

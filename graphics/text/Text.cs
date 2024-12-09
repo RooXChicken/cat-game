@@ -7,20 +7,22 @@ public class Text : Drawable
     public Font font { get; private set; }
 
     public string text = "";
-    private string oldText = "";
-    
+
     private Color oldColor;
+    private string oldText;
 
     public Text(nint renderer, string _text, Font _font, Color _color)
     {
         font = _font;
         color = _color;
         text = _text;
+        oldText = "NULL";
+        oldColor = new Color(255, 255, 255);
 
         renderText(renderer);
     }
 
-    public void renderText(nint renderer)
+    private void renderText(nint renderer)
     {
         if(text == oldText && color == oldColor)
             return;
@@ -36,7 +38,9 @@ public class Text : Drawable
         
         string[] lines = text.Split('\n');
 
+        nint target = SDL_GetRenderTarget(renderer);
         nint surface = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, (int)640, (int)font.characterSize*(lines.Length+1)*2);
+        
         SDL_SetRenderTarget(renderer, surface);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
@@ -53,13 +57,15 @@ public class Text : Drawable
             sprite.destroy();
         }
 
-        SDL_SetRenderTarget(renderer, IntPtr.Zero);
+        SDL_SetRenderTarget(renderer, target);
         renderedText = new Sprite(new Texture(surface));
     }
 
     public override void draw(nint surface, Vector2d cameraCenter)
     {
         base.draw(surface, cameraCenter);
+
+        renderText(surface);
         renderedText.position = position;
         renderedText.draw(surface, cameraCenter);
     }

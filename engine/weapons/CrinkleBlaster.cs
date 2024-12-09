@@ -10,7 +10,7 @@ public class CrinkleBlaster : Weapon
     {
         sprite = new Sprite("assets/sprites/weapons/crinkle_blaster.png");
         sprite.offset = new Vector2d(0, 5);
-        fireSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
         sprite.origin -= new Vector2d(2, 0);
         id = 4;
         

@@ -33,6 +33,8 @@ public class Sprite : Drawable
         init(_texture, new Vector2d(0, 0));
     }
 
+    private Sprite(Texture _texture, Vector2d _offset, SDL_Rect _textureBounds, Vector2d _size, Vector2d _origin, double _rotation) { texture = _texture; offset = _offset; textureBounds = _textureBounds; size = _size; origin = _origin; rotation = _rotation; }
+
     private void init(Texture _texture, Vector2d _offset)
     {
         texture = _texture;
@@ -66,12 +68,13 @@ public class Sprite : Drawable
         if(size.y < 0)
             flip |= SDL_RendererFlip.SDL_FLIP_VERTICAL;
 
-        SDL_SetTextureColorMod(texture.pointer, color.r, color.g, color.b);
+        SDL_SetTextureColorMod(texture.pointer, (color - tint).r, (color - tint).g, (color - tint).b);
         SDL_SetTextureAlphaMod(texture.pointer, color.a);
 
         SDL_RenderCopyEx(surface, texture.pointer, ref textureBounds, ref rect, rotation, ref point, flip);
     }
 
+    public Sprite clone() { return new Sprite(texture, offset, textureBounds, size, origin, rotation); }
     public void destroy() { texture.destroy(); }
     public void setTexture(Texture _texture) { if(texture.shouldDestroy) texture.destroy(); texture = _texture; }
 

@@ -1,6 +1,5 @@
 public class TextBox : Entity
 {
-    private nint renderer;
     private int t = 0;
     private int character = 0;
     private Text textRender;
@@ -14,10 +13,9 @@ public class TextBox : Entity
 
     public TextBox(string[] _text, nint _renderer, Font font) : base(new Vector2d(0, 300), 0)
     {
-        renderer = _renderer;
         text = _text;
         
-        textRender = new Text(renderer, "", font, Color.BLACK);
+        textRender = new Text(_renderer, "", font, Color.BLACK);
         textRender.position = new Vector2d(135, 255);
 
         textBox = new Sprite("assets/sprites/textbox.png");
@@ -25,7 +23,7 @@ public class TextBox : Entity
         textBox.size = new Vector2d(4, 4);
 
         currentText = text[index].Substring(2);
-        icon = new Sprite(new Texture(renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
+        icon = new Sprite(new Texture(_renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
         icon.size = new Vector2d(4, 4);
         icon.position = new Vector2d(36, 266);
         dialogueTick = new SoundEffect("assets/sounds/dialogue_tick.wav");
@@ -35,13 +33,12 @@ public class TextBox : Entity
 
     public override void tick()
     {
-        if(Input.isMouseJustPressed(1) || Input.isJoyJustPressed(0, 1) || Input.isJoyJustPressed(1, 1))
+        if(Input.isMouseJustPressed(1) || Input.isJoyJustPressed(0, SDL2.SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A) || Input.isJoyJustPressed(1, SDL2.SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A))
         {
             if(character <= currentText.Length)
             {
                 character = currentText.Length;
                 textRender.text = currentText;
-                textRender.renderText(renderer);
             }
             else if(character >= currentText.Length)
             {
@@ -50,7 +47,7 @@ public class TextBox : Entity
                     character = 0;
                     index++;
                     currentText = text[index].Substring(2);
-                    icon.setTexture(new Texture(renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
+                    icon.setTexture(new Texture(Sprite.renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
                 }
                 else
                     kill();
@@ -62,7 +59,6 @@ public class TextBox : Entity
             if(++character <= currentText.Length)
             {
                 textRender.text = currentText.Substring(0, character);
-                textRender.renderText(renderer);
             }
         }
 
