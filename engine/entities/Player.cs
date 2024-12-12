@@ -55,8 +55,8 @@ public class Player : LivingEntity
         bg = _bg;
         type = _type;
         //if(bg == 0)
-            Input.registerController(bg);
-        //bg = -1;
+            //Input.registerController(bg);
+        bg *= -1;
         
         hitbox = new Hitbox(new Vector2d(12,24));
         hitbox.offset = new Vector2d(6, 0);
@@ -69,7 +69,7 @@ public class Player : LivingEntity
         crosshair.color = new Color(158, 163, 245);
         crosshair.offset = new Vector2d(-3.5, -3.5);
 
-        string filename = bg == 0 ? "bella" : "gavin";
+        string filename = type == 0 ? "bella" : "gavin";
         idle = new Sprite("assets/sprites/player/" + filename + "idle.png");
         sit = new Sprite("assets/sprites/player/" + filename + "sit.png");
         down = new Sprite("assets/sprites/player/" + filename + "down.png");
@@ -128,8 +128,9 @@ public class Player : LivingEntity
         ignored.Add(8);
         lastCrosshairPosition = getCenter();
 
-        Game.spawnEntity(new PlayerShadow(this));
-        items.Add(UsableItem.fromID(20));
+        PlayerShadow shadow = new PlayerShadow(this);
+        shadow.render = true;
+        Game.spawnEntity(shadow);
     }
 
     public void moveFromCouch() { teleport(getRawPosition() + new Vector2d(14, 0)); }

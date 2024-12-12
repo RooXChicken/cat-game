@@ -7,7 +7,7 @@ public class PlayerShadow : Entity
     private Entity player;
     public Sprite shadow;
 
-    public bool render = true;
+    public bool render = false;
 
     public PlayerShadow(Entity _player) : base(_player.getRawPosition(), 0)
     {
@@ -28,7 +28,10 @@ public class PlayerShadow : Entity
     {
         if(!render)
             return;
-            
+
+        if(player.drawable != null)
+            shadow.color.a = player.drawable.color.a;
+        
         base.draw(window, alpha);
     }
 }

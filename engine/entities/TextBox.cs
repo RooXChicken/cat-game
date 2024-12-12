@@ -46,6 +46,14 @@ public class TextBox : Entity
                 {
                     character = 0;
                     index++;
+                    if(text[index].Substring(0, 3).Contains("%_"))
+                    {
+                        switch(text[index][2])
+                        {
+                            case '1': Game.playCutscene(new BobaRun()); break;
+                        }
+                        index++;
+                    }
                     currentText = text[index].Substring(2);
                     icon.setTexture(new Texture(Sprite.renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
                 }

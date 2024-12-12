@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using SDL2;
 using static SDL2.SDL;
@@ -13,6 +14,7 @@ public class RenderWindow
     public static Font font { get; private set; }
     public static Font gameFont { get; private set; }
     public Vector2d cameraCenter;
+    public double zoom = 1.0;
 
     public uint gWidth { get; private set; }
     public uint gHeight { get; private set; }
@@ -20,6 +22,7 @@ public class RenderWindow
     public uint rHeight { get; private set; }
 
     public string name { get; private set; }
+    private List<Drawable> toDrawNC;
 
     public double relativeSize { get { int width; int height; SDL_GetWindowSize(window, out width, out height); return width/gWidth; } set{} }
 
@@ -51,6 +54,8 @@ public class RenderWindow
         rWidth = _rWidth;
         rHeight = _rHeight;
         name = _name;
+
+        toDrawNC = new List<Drawable>();
 
         window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)rWidth, (int)rHeight, _flags);
         SDL_ShowCursor(SDL_DISABLE);
@@ -149,9 +154,37 @@ public class RenderWindow
 
     public void draw(Drawable drawable) { drawable.draw(renderer, cameraCenter); }
     public void drawNC(Drawable drawable) { drawable.draw(renderer, new Vector2d(0, 0)); }
+    
+    public void drawUI(Drawable drawable) { drawable.draw(renderer, new Vector2d(0, 0)); }
 
-    public void display() { SDL_SetRenderTarget(renderer, IntPtr.Zero); SDL_RenderCopy(renderer, surface, IntPtr.Zero, IntPtr.Zero); SDL_RenderPresent(renderer); }
+    public void display()
+    {
+        SDL_SetRenderTarget(renderer, IntPtr.Zero);
 
-    [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int SDL_RenderCopyExF(IntPtr renderer, IntPtr texture, ref SDL_Rect srcrect, ref SDL_FRect dstrect, double angle, ref SDL_FPoint center, SDL_RendererFlip flip);
+        SDL_Rect scaled;
+        scaled.x = (int)(640 * (1-zoom));
+        scaled.y = (int)(360 * (1-zoom));
+        scaled.w = (int)(1280 * zoom);
+        scaled.h = (int)(720 * zoom);
+        SDL_RenderCopy(renderer, surface, IntPtr.Zero, ref scaled);
+
+        // SDL_SetRenderTarget(renderer, surface);
+
+        // SDL_SetTextureAlphaMod(renderer, 0);
+        // SDL_RenderClear(renderer);
+
+        // foreach(Drawable drawable in toDrawNC)
+        //     drawable.draw(renderer, new Vector2d(0, 0));
+
+        // SDL_SetRenderTarget(renderer, IntPtr.Zero);
+        // SDL_RenderCopy(renderer, surface, IntPtr.Zero, IntPtr.Zero);
+
+
+        SDL_RenderPresent(renderer);
+    }
+
+    //optional import of ExF (not included in SDL2-CS for some reason)
+
+    //[DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+    //public static extern int SDL_RenderCopyExF(IntPtr renderer, IntPtr texture, ref SDL_Rect srcrect, ref SDL_FRect dstrect, double angle, ref SDL_FPoint center, SDL_RendererFlip flip);
 }

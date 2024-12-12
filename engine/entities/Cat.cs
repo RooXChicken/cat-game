@@ -1,42 +1,34 @@
 using System.Data.Common;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Security;
 
 public class Cat : LivingEntity
 {
-    private Sprite idle;
-    private Sprite slide;
-    private Sprite walk;
-    private Sprite loaf;
+    protected Sprite idle;
+    protected Sprite walk;
+    protected Sprite loaf;
 
-    private double anim = 0;
-    private bool direction = true;
+    protected double anim = 0;
+    protected bool direction = true;
 
-    private int state = -1;
+    protected int state = -1;
     public int phaseDuration = 4;
-    private int time = 0;
-    private Vector2d target = new Vector2d(0, 0);
-    private int targettedPlayer = 0;
+    protected int time = 0;
+    protected Vector2d target = new Vector2d(0, 0);
+    protected int targettedPlayer = 0;
 
-    private double[] speeds;
+    protected double[] speeds;
 
-    private int dashTime = 0;
+    protected int dashTime = 0;
+    
+    protected bool playedAngryCutscene = false;
+    protected bool playedWinCutscene = false;
+
+    public PlayerShadow shadow { get; protected set; }
 
     public Cat(Vector2d _position) : base(_position, 1, new Hitbox(new Vector2d(25,23)))
     {
-        idle = new Sprite("assets/sprites/cats/boba/bobaidle.png");
-        slide = new Sprite("assets/sprites/cats/boba/bobaslide.png");
-        walk = new Sprite("assets/sprites/cats/boba/bobawalk.png");
-        loaf = new Sprite("assets/sprites/cats/catloaf.png");
-        idle.offset = new Vector2d(-4, -1);
-        walk.offset = new Vector2d(-4, -1);
-        walk.textureBounds.w = 32;
-        //walk = new Sprite("assets/sprites/player/bellawalk.png");
-        // walk.textureBounds.w = 24;
-        drawable = idle;
-
-        maxHealth = 280;
-        health = maxHealth;
         damageable = true;
 
         collision = 2;
@@ -45,11 +37,12 @@ public class Cat : LivingEntity
         ignored.Add(5);
         ignored.Add(8);
         ignored.Add(11);
-        dealtDamage = 1.2;
 
-        speeds = new double[] { 0.6, 1, 1.6 };
+        speeds = new double[0];
 
-        Game.spawnEntity(new PlayerShadow(this));
+        shadow = new PlayerShadow(this);
+        shadow.render = true;
+        Game.spawnEntity(shadow);
     }
 
     public override void tick()
@@ -62,26 +55,30 @@ public class Cat : LivingEntity
             health = 0;
             state = -2;
             effects.Clear();
+            teleport(getRawPosition());
+
+            if(!playedWinCutscene)
+            {
+                playedWinCutscene = true;
+                playWinCutscene();
+            }
             return;
+        }
+
+        if(health <= maxHealth/2 && !playedAngryCutscene)
+        {
+            playedAngryCutscene = true;
+            playAngryCutscene();
         }
 
         if(--phaseDuration <= 0)
         {
             phaseDuration = Game.random.Next(6, 14)*120;
-            state = Game.random.Next(0, 2) + (health < maxHealth/2 ? 1 : 0);
-            targettedPlayer = 0;
-            //targettedPlayer = Game.random.Next(0, 2);
+            state = getState();
+            targettedPlayer = Game.random.Next(0, 2);
         }
 
-
-        switch(state)
-        {
-            case 0: state_chase(); break;
-            case 1: state_chaos(); break;
-            case 2: state_dash(); break;
-
-            case -1: state_peace(); break;
-        }
+        processCatAI();
 
         Vector2d _target = target;
 
@@ -93,8 +90,7 @@ public class Cat : LivingEntity
         if(state >= 0)
             velocity = _target.distanceSquared(getRawPosition()) > 1 ? _target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[state] * (hasEffect(0) ? 1.35 : 1))) : new Vector2d(0, 0);
 
-        //state = 2;
-        if(hasEffect(3))
+        if(hasEffect(3)) //loaf
             velocity = new Vector2d(0, 0);
         
         basicCollision();
@@ -126,7 +122,7 @@ public class Cat : LivingEntity
                 drawable = idle;
         }
 
-        walk.textureBounds.x = (int)anim * 32;
+        walk.textureBounds.x = (int)anim * 64;
 
         if(hasEffect(3))
             drawable = loaf;
@@ -149,56 +145,19 @@ public class Cat : LivingEntity
         }
     }
 
+    public virtual int getState() { return -1; }
+
+    public virtual void processCatAI() { }
+
+    public virtual void playAngryCutscene() { }
+    public virtual void playWinCutscene() { }
+
     public override void damage(double damage)
     {
         if(state < 0)
             return;
             
         base.damage(damage * (hasEffect(0) ? 1.35 : 1));
-    }
-
-    private void state_peace()
-    {
-        phaseDuration = 4;
-        target = new Vector2d(10000, 10000);
-        drawable.color = new Color(255, 255, 255, (byte)Math.Max(0, 255-(++time*3)));
-
-        velocity = target.distanceSquared(getRawPosition()) > 1 ? target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[1])) : new Vector2d(0, 0);
-    }
-
-    private void state_chaos()
-    {
-        if(target.distanceSquared(getRawPosition()) < 1)
-            time = 0;
-
-        if(--time <= 0)
-        {
-            time = Game.random.Next(30, 160);
-            target = new Vector2d(Game.random.NextDouble() * 258 + 16, Game.random.NextDouble() * 618 + 16);
-        }
-    }
-
-    private void state_chase()
-    {
-        target = Game.entities[1][getTargettedPlayer()].getRawPosition() - new Vector2d(0, 2);
-    }
-
-    private void state_dash()
-    {
-        if(--dashTime <= 0)
-        {
-            target = Game.entities[1][getTargettedPlayer()].getRawPosition() + getRawPosition().getDirectionBetweenPoints(Game.entities[1][getTargettedPlayer()].getRawPosition())*-48;
-            dashTime = 120;
-        }
-
-        if(Math.Abs(velocity.x) + Math.Abs(velocity.y) > 0.6)
-        {
-            drawable = slide;
-            if(dashTime % 10 == 0)
-                Game.spawnParticle(new DustParticle(getRawPosition() + new Vector2d(direction ? hitbox.size.x : 0, idle.textureBounds.h)));
-        }
-        else
-            drawable = idle;
     }
 
     public override void draw(RenderWindow window, float alpha)
@@ -210,7 +169,7 @@ public class Cat : LivingEntity
 
     public override bool genericCollision(Entity entity)
     {
-        if(entity.collision == 4 && state == 1)
+        if(entity.collision == 4)
             time = 0;
             
         return base.genericCollision(entity);

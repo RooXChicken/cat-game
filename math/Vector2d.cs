@@ -36,4 +36,6 @@ public class Vector2d
 
         return vec;
     }
+
+    public static Vector2d lerp(Vector2d a, Vector2d b, double t) { return new Vector2d(double.Lerp(a.x, b.x, t), double.Lerp(a.y, b.y, t)); }
 }

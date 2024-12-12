@@ -24,6 +24,7 @@ public class ItemPickup : Entity
 
         shadow = new PlayerShadow(this);
         shadow.shadow.offset = new Vector2d(5, 12);
+        shadow.render = true;
         Game.spawnEntity(shadow);
     }
 

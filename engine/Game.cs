@@ -8,6 +8,8 @@ public class Game
     public static Dictionary<int, List<Entity>> entities = new Dictionary<int, List<Entity>>();
     public static double catHealth = 1.0;
     private static List<Entity> toSpawn = new List<Entity>();
+    private static List<Cutscene> activeCutscenes = new List<Cutscene>();
+    private static List<Cutscene> toPlay = new List<Cutscene>();
     public static bool debug = false;
     public static Random random = new Random();
     public static SpawnManager spawnManager = new SpawnManager();
@@ -84,7 +86,7 @@ public class Game
         spawnEntity(new Player(0, new Vector2d(35, 218), 0));
         spawnEntity(new Player(1, new Vector2d(35, 242), 1));
 
-        spawnEntity(new Cat(new Vector2d(100, 200)));
+        spawnEntity(new BeanCat(new Vector2d(100, 200)));
         spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));
         spawnEntity(new CollidableDecor("assets/sprites/decor/table.png", new Vector2d(72, 220)));
         spawnEntity(new CollidableDecor("assets/sprites/decor/couch.png", new Vector2d(32, 212)));
@@ -107,6 +109,7 @@ public class Game
         ItemPickup _treatPistol = new ItemPickup(Weapon.fromID(2));
         _treatPistol.teleport(new Vector2d(130, 164));
         _treatPistol.onSpawn();
+        _treatPistol.shadow.render = true;
         spawnEntity(_treatPistol);
 
         foreach(KeyValuePair<Vector2d, bool> location in possibleSpawns)
@@ -114,9 +117,9 @@ public class Game
 
         tick();
         phaseText.position = new Vector2d(260, 4);
-        t = 0;
+        t = 7100;
         
-        textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!" }, window.renderer, RenderWindow.font);
+        textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!", "%_1", "%1We have to do something!", "%2She's just chilling", "%3...", "%1I feel like she's getting into tons of trouble.\nLet's try to find some things to\nhelp calm her down!" }, window.renderer, RenderWindow.font);
     }
 
     public void update()
@@ -133,11 +136,34 @@ public class Game
 
     public void tick()
     {
+        bool halt = false;
+
+        foreach(Cutscene _toPlay in toPlay)
+            activeCutscenes.Add(_toPlay);
+
+        toPlay.Clear();
+
+        List<Cutscene> toStop = new List<Cutscene>();
+        foreach(Cutscene cutscene in activeCutscenes)
+        {
+            cutscene.onTick();
+            if(cutscene.remove) { toStop.Add(cutscene); continue; }
+            if(cutscene.haltGame) halt = true;
+        }
+
+        foreach(Cutscene _toStop in toStop) { _toStop.onRemove(); activeCutscenes.Remove(_toStop); }
+
+        if(halt)
+        {
+            Input.update();
+            return;
+        }
+
         if(textBox != null && !textBox.remove)
         {
             textBox.tick();
             Input.update();
-            //textBox.kill();
+            textBox.kill();
 
             if(textBox.remove)
             {
@@ -228,6 +254,19 @@ public class Game
         if(alivePlayers > 0)
             window.cameraCenter = centerPoint/alivePlayers - new Vector2d(window.gWidth/2.0, window.gHeight/2.0) + entities[1][0].hitbox.size/2;
 
+        bool drawUI = true;
+        bool noSmoothing = false;
+
+        foreach(Cutscene cutscene in activeCutscenes)
+        {
+            cutscene.preDraw(window);
+            if(!cutscene.drawUI) drawUI = false;
+            if(cutscene.noSmoothing) noSmoothing = true;
+        }
+
+        if(noSmoothing)
+            alpha = 0;
+
         window.draw(tilemap);
 
         List<Entity> drawOrder = new List<Entity>(entities[0]);
@@ -240,17 +279,26 @@ public class Game
             foreach(Entity obj in entities[0])
                 if(obj.hitbox != null) window.draw(obj.hitbox);
 
-        window.drawNC(bossbarFill);
-        window.drawNC(new Rectangle(new Vector2d(146, 324), new Vector2d(348 * (1-catHealth), 28), new Color(61, 140, 64)));
-        window.drawNC(bossbarOutline);
+        if(drawUI)
+        {
+            if(textBox != null && !textBox.remove)
+                textBox.draw(window, alpha);
+            else
+            {
+                window.drawNC(bossbarFill);
+                window.drawNC(new Rectangle(new Vector2d(146, 324), new Vector2d(348 * (1-catHealth), 28), new Color(61, 140, 64)));
+                window.drawNC(bossbarOutline);
 
-        if(t > 0)
-            window.drawNC(phaseText);
+                if(t > 0)
+                    window.drawNC(phaseText);
+            }
+        }
 
-        if(textBox != null && !textBox.remove)
-            textBox.draw(window, alpha);
+        foreach(Cutscene cutscene in activeCutscenes)
+            cutscene.postDraw(window);
     }
 
     public static void spawnEntity(Entity entity) { toSpawn.Add(entity); }
+    public static void playCutscene(Cutscene cutscene) { toPlay.Add(cutscene); }
     public static void spawnParticle(Particle particle) { particles.particles.Add(particle); }
 }
