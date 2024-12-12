@@ -10,17 +10,17 @@ class JoystickButton : IEquatable<JoystickButton>
     public bool Equals(JoystickButton? other) { return (other != null && controller == other.controller && button == other.button); }
 }
 
-// class JoystickAxis
-// {
-//     public int controller = -1;
-//     public Vector2d lAxis;
-//     public Vector2d rAxis;
+class JoystickAxis
+{
+    public nint controller = -1;
+    public Vector2d lAxis;
+    public Vector2d rAxis;
 
-//     public double ZLAxis;
-//     public double ZRAxis;
+    public double ZLAxis;
+    public double ZRAxis;
 
-//     public JoystickAxis(int _controller) { controller = _controller; lAxis = new Vector2d(0, 0); rAxis = new Vector2d(0, 0); ZLAxis = 0; ZRAxis = 0; }
-// }
+    public JoystickAxis(nint _controller) { controller = _controller; lAxis = new Vector2d(0, 0); rAxis = new Vector2d(0, 0); ZLAxis = 0; ZRAxis = 0; }
+}
 
 public class Input
 {
@@ -38,7 +38,7 @@ public class Input
     private static List<JoystickButton> jheld = new List<JoystickButton>();
     private static List<JoystickButton> jreleased = new List<JoystickButton>();
 
-    // private static Dictionary<int, JoystickAxis> joyAxies = new Dictionary<int, JoystickAxis>();
+    private static Dictionary<int, JoystickAxis> joyAxies = new Dictionary<int, JoystickAxis>();
 
     private static Vector2i mousePosition = new Vector2i(0, 0);
     private static double mouseScroll = 0;
@@ -63,6 +63,7 @@ public class Input
             Console.WriteLine("Failed to connect to controller! " + SDL_GetError());
 
         registeredControllers[index] = controller;
+        joyAxies[index] = new JoystickAxis(controller);
     }
     // public static void registerController(int index)
     // {
@@ -99,6 +100,14 @@ public class Input
         
         jpressed.Clear();
         jreleased.Clear();
+
+        foreach(JoystickAxis axis in joyAxies.Values)
+        {
+            axis.lAxis = new Vector2d(SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX)/(short.MaxValue*1.0), SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY)/(short.MaxValue*1.0));
+            axis.rAxis = new Vector2d(SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX)/(short.MaxValue*1.0), SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY)/(short.MaxValue*1.0));
+            axis.ZLAxis = SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT)/(short.MaxValue*1.0);
+            axis.ZRAxis = SDL_GameControllerGetAxis(axis.controller, SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT)/(short.MaxValue*1.0);
+        }
     }
 
     public static void _keyDown(SDL_Event e)
@@ -234,15 +243,15 @@ public class Input
     public static Vector2d getJoyAxis(int controller, int axis)
     {
         Vector2d stick = new Vector2d(0, 0);
-        if(registeredControllers.Length <= controller)
+        if(!joyAxies.ContainsKey(controller))
             return stick;
             
         switch(axis)
         {
-            case 0: stick = new Vector2d(SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX)/(short.MaxValue*1.0), SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY)/(short.MaxValue*1.0)); break;
-            case 1: stick = new Vector2d(SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX)/(short.MaxValue*1.0), SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY)/(short.MaxValue*1.0)); break;
-            case 2: double valueTL = SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT)/(short.MaxValue*1.0); stick = new Vector2d(valueTL, valueTL); break;
-            case 3: double valueTR = SDL_GameControllerGetAxis(registeredControllers[controller], SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT)/(short.MaxValue*1.0); stick = new Vector2d(valueTR, valueTR); break;
+            case 0: stick = joyAxies[controller].lAxis; break;
+            case 1: stick = joyAxies[controller].rAxis; break;
+            case 2: stick = new Vector2d(joyAxies[controller].ZLAxis, joyAxies[controller].ZLAxis); break;
+            case 3: stick = new Vector2d(joyAxies[controller].ZRAxis, joyAxies[controller].ZRAxis); break;
 
             default: return new Vector2d(0, 0);
         }

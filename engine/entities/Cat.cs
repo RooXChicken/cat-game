@@ -122,7 +122,7 @@ public class Cat : LivingEntity
                 drawable = idle;
         }
 
-        walk.textureBounds.x = (int)anim * 64;
+        walk.textureBounds.x = (int)anim * 32;
 
         if(hasEffect(3))
             drawable = loaf;

@@ -10,6 +10,9 @@ neccesary to FINISH THE GAME IN TIME:
 add other 3 cats
 add tutorial and main menu
 
+maybe adjust difficulty
+add a button to show what the item is (temporarily show tooltip)
+
 game ideas:
 
 two phases of game loop:

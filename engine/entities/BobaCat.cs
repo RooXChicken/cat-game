@@ -18,8 +18,8 @@ public class BobaCat : Cat
         
         drawable = idle;
 
-        maxHealth = 280;
-        health = 2;
+        maxHealth = 140;
+        health = maxHealth;
         damageable = true;
 
         dealtDamage = 1.2;

@@ -63,7 +63,7 @@ public class Game
 
         timer = new Timer();
 
-        for(int i = 0; i < 64; i++)
+        for(int i = 0; i < 32; i++)
             entities.Add(i, new List<Entity>());
 
         phaseText = new Text(window.renderer, "Scavenge Phase", RenderWindow.font, Color.WHITE);
@@ -117,7 +117,7 @@ public class Game
 
         tick();
         phaseText.position = new Vector2d(260, 4);
-        t = 7100;
+        t = 0;
         
         textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!", "%_1", "%1We have to do something!", "%2She's just chilling", "%3...", "%1I feel like she's getting into tons of trouble.\nLet's try to find some things to\nhelp calm her down!" }, window.renderer, RenderWindow.font);
     }
@@ -163,7 +163,7 @@ public class Game
         {
             textBox.tick();
             Input.update();
-            textBox.kill();
+            //textBox.kill();
 
             if(textBox.remove)
             {

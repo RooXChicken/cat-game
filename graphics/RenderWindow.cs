@@ -26,6 +26,10 @@ public class RenderWindow
 
     public double relativeSize { get { int width; int height; SDL_GetWindowSize(window, out width, out height); return width/gWidth; } set{} }
 
+    private int lastFPSTimer = 0;
+    private int countedFrames = 0;
+    private int fps = 0;
+
     public RenderWindow(uint _gWidth, uint _gHeight, uint _rWidth, uint _rHeight, string _name)
     {
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0)
@@ -122,6 +126,18 @@ public class RenderWindow
                 case SDL_EventType.SDL_CONTROLLERBUTTONDOWN: Input._joyDown(e); break;
                 case SDL_EventType.SDL_CONTROLLERBUTTONUP: Input._joyUp(e); break;
 
+                case SDL_EventType.SDL_WINDOWEVENT:
+
+                switch(e.window.windowEvent)
+                {
+                    case SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
+                    rWidth = (uint)e.window.data1;
+                    rHeight = (uint)e.window.data2;
+                    break;
+                }
+
+                break;
+
                 //case SDL_EventType.SDL_AUDIODEVICEADDED: registerSound(); break;
             }
         }
@@ -162,10 +178,10 @@ public class RenderWindow
         SDL_SetRenderTarget(renderer, IntPtr.Zero);
 
         SDL_Rect scaled;
-        scaled.x = (int)(640 * (1-zoom));
-        scaled.y = (int)(360 * (1-zoom));
-        scaled.w = (int)(1280 * zoom);
-        scaled.h = (int)(720 * zoom);
+        scaled.x = (int)(gWidth * (1-zoom));
+        scaled.y = (int)(gHeight * (1-zoom));
+        scaled.w = (int)(rWidth * zoom);
+        scaled.h = (int)(rHeight * zoom);
         SDL_RenderCopy(renderer, surface, IntPtr.Zero, ref scaled);
 
         // SDL_SetRenderTarget(renderer, surface);
@@ -181,6 +197,16 @@ public class RenderWindow
 
 
         SDL_RenderPresent(renderer);
+
+        countedFrames++;
+        if(SDL_GetTicks() / 1000 > lastFPSTimer)
+        {
+            lastFPSTimer = (int)(SDL_GetTicks() / 1000);
+            fps = countedFrames;
+            countedFrames = 0;
+
+            Console.WriteLine(fps);
+        }
     }
 
     //optional import of ExF (not included in SDL2-CS for some reason)

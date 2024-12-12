@@ -8,11 +8,11 @@ public class BeanCat : Cat
     public BeanCat(Vector2d _position) : base(_position)
     {
         idle = new Sprite("assets/sprites/cats/bean/bean_idle.png");
-        walk = new Sprite("assets/sprites/cats/bean/bean_wheel_run.png");
+        walk = new Sprite("assets/sprites/cats/bean/bean_walk.png");
         loaf = new Sprite("assets/sprites/cats/bean/bean_loaf.png");
         idle.offset = new Vector2d(-4, -1);
         walk.offset = new Vector2d(-4, -1);
-        walk.textureBounds.w = 64;
+        walk.textureBounds.w = 32;
         
         drawable = idle;
 

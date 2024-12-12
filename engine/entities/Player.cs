@@ -50,13 +50,15 @@ public class Player : LivingEntity
     private int weaponHeldTimer = 0;
     private bool justSwitched = false;
 
+    private Tooltip heldItemTooltip;
+
     public Player(int _bg, Vector2d _position, int _type) : base(_position, 1, null)
     {
         bg = _bg;
         type = _type;
         //if(bg == 0)
-            //Input.registerController(bg);
-        bg *= -1;
+            Input.registerController(bg);
+        //bg *= -1;
         
         hitbox = new Hitbox(new Vector2d(12,24));
         hitbox.offset = new Vector2d(6, 0);
@@ -214,6 +216,31 @@ public class Player : LivingEntity
 
         if(crosshair.position.distanceSquared(getCenter()) > 8)
             lastCrosshairPosition = crosshair.position;
+
+        if(Input.isJoyPressed(bg, SDL2.SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X))
+        {
+            if(heldItemTooltip == null)
+            {
+                heldItemTooltip = new Tooltip(getRawPosition(), "", "", false);
+                Game.spawnEntity(heldItemTooltip);
+            }
+
+            if(selectedWeapon < items.Count)
+            {
+                heldItemTooltip.name = items[selectedWeapon].name;
+                heldItemTooltip.desc = items[selectedWeapon].desc;
+
+                heldItemTooltip.active = true;
+                heldItemTooltip.tooltipPosition = getRawPosition() + new Vector2d(28, 1);
+
+                heldItemTooltip.redrawTooltip();
+            }
+        }
+        else
+        {
+            if(heldItemTooltip != null)
+                heldItemTooltip.active = false;
+        }
 
         Vector2d crosshairDirection = lastCrosshairPosition.getDirectionBetweenPoints(getCenter());
         double shootAngle = Math.Abs(Math.Atan2(crosshairDirection.x, crosshairDirection.y)-3) * 60 - 90;
@@ -516,7 +543,8 @@ public class Player : LivingEntity
         Vector2d crosshairRawPosition;
         if(bg == -1)
         {
-            crosshairRawPosition = (Vector2d)Input.getMousePosition()/window.relativeSize - new Vector2d(window.gWidth, window.gHeight - 7)/2 - new Vector2d(5, 0);
+            crosshairRawPosition = (Vector2d)Input.getMousePosition()/window.relativeSize - new Vector2d(5, 0);
+            crosshair.position = window.cameraCenter + crosshairRawPosition + new Vector2d(idle.textureBounds.w/2.0, idle.textureBounds.h/2.0 - 8);
             crosshair.color.a = 255;
         }
         else
@@ -525,10 +553,9 @@ public class Player : LivingEntity
             double lJoyValue = Math.Abs(Input.getJoyAxis(bg, 0).x) + Math.Abs(Input.getJoyAxis(bg, 0).y);
 
             crosshairRawPosition = (Vector2d)(rJoyValue > 0.2 ? (Input.getJoyAxis(bg, 1)*63) : (Input.getJoyAxis(bg, 0)*32));
+            crosshair.position = getBlendPosition(alpha) + crosshairRawPosition + new Vector2d(idle.textureBounds.w/2.0, idle.textureBounds.h/2.0 - 8);
             crosshair.color.a = (byte)(Math.Min(254, crosshair.position.distanceSquared(getRawPosition())*4));
         }
-
-        crosshair.position = getBlendPosition(alpha) + crosshairRawPosition + new Vector2d(idle.textureBounds.w/2.0, idle.textureBounds.h/2.0 - 8);
 
         if(crosshair.color.a > 64)
             window.draw(crosshair);
