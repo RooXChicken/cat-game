@@ -6,7 +6,7 @@ public class LuckyBag : UsableItem
         sprite = new Sprite("assets/sprites/items/lucky_bag.png");
         sprite.offset = new Vector2d(8, 5);
         sprite.origin -= new Vector2d(2, 0);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/generic_use.wav");
         id = 8;
 
         name = "Lucky Bag";
@@ -23,6 +23,7 @@ public class LuckyBag : UsableItem
             pickup.teleport(player.getRawPosition() + new Vector2d(Game.random.NextDouble()*32-16,Game.random.NextDouble()*32-16));
             Game.spawnEntity(pickup);
         }
+        useSound.play();
 
         destroy = true;
 

@@ -13,7 +13,7 @@ public class Entity : IComparable<Entity>
     public bool pushable { get; protected set; }
     public bool solid { get; protected set; }
 
-    public bool remove { get; private set; }
+    public bool remove = false;
     public int drawOrder { get; protected set; }
 
     public Entity(Vector2d _position, byte _collision) { init(_position, _collision, null); }
@@ -36,7 +36,7 @@ public class Entity : IComparable<Entity>
         teleport(_position);
     }
 
-    public virtual void teleport(Vector2d _position, bool lerp = false) { if(!lerp) lastPos = _position; else lastPos = new Vector2d(nextPos.x, nextPos.x); nextPos = _position; }
+    public virtual void teleport(Vector2d _position, bool lerp = false) { if(!lerp) { lastPos = _position; } else { lastPos = new Vector2d(nextPos.x, nextPos.y); } nextPos = _position; }
 
     public Vector2d getBlendPosition(float alpha) { if(lastPos.distanceSquared(nextPos) < 0.1) return nextPos; return new Vector2d(Double.Lerp(lastPos.x, nextPos.x, alpha), Double.Lerp(lastPos.y, nextPos.y, alpha)); }
     public Vector2d getRawPosition() { return nextPos; }
@@ -53,13 +53,20 @@ public class Entity : IComparable<Entity>
     public virtual void tick() { if(hitbox != null) hitbox.setPosition(getRawPosition()); }
     protected bool basicCollision()
     {
+        if(!solid)
+            return false;
+
         bool hit = false;
+        int iter = 1;
+        iter += (int)Math.Ceiling(Math.Abs(velocity.x) / hitbox.size.x);
+        iter += (int)Math.Ceiling(Math.Abs(velocity.y) / hitbox.size.y);
+
         foreach(Entity entity in Game.entities[0])
         {
-            if(entity == this || !entity.solid)
+            if(entity == this || !entity.solid || entity.getRawPosition().distance(getRawPosition()) > (hitbox.size.x + hitbox.size.y + entity.hitbox.size.x + entity.hitbox.size.y)*2)
                 continue;
-                
-            CollisionPair collision = Collision.EECD(this, entity, 16);
+
+            CollisionPair collision = Collision.EECD(this, entity, iter);
             if(collision.valid)
             {
                 hit = true;

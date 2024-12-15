@@ -16,5 +16,5 @@ public class Cutscene
     public virtual void preDraw(RenderWindow window) { }
     public virtual void postDraw(RenderWindow window) { }
 
-    public virtual void onRemove() { }
+    public virtual void onRemove(Game game) { }
 }

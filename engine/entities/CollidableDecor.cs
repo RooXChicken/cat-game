@@ -2,13 +2,15 @@
 public class CollidableDecor : Entity
 {
     private Sprite sprite;
+    public string path;
 
-    public CollidableDecor(string path, Vector2d _position, Hitbox _hitbox = null, bool flip = false, int _drawOrder = 0) : base(_position, 2, new Hitbox(new Vector2d(0,0)))
+    public CollidableDecor(string _path, Vector2d _position, Hitbox _hitbox = null, bool flip = false, int _drawOrder = 0) : base(_position, 14, new Hitbox(new Vector2d(0,0)))
     {
+        path = _path;
         init(new Sprite(path), _position, _hitbox, flip, _drawOrder);
     }
 
-    public CollidableDecor(Sprite sprite, Vector2d _position, Hitbox _hitbox = null, bool flip = false, int _drawOrder = 0) : base(_position, 2, new Hitbox(new Vector2d(0,0)))
+    public CollidableDecor(Sprite sprite, Vector2d _position, Hitbox _hitbox = null, bool flip = false, int _drawOrder = 0) : base(_position, 14, new Hitbox(new Vector2d(0,0)))
     {
         init(sprite, _position, _hitbox, flip, _drawOrder);
     }

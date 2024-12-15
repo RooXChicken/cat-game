@@ -31,6 +31,20 @@ public class TextBox : Entity
         solid = false;
     }
 
+    public void reset(string[] _text)
+    {
+        text = _text;
+    
+        index = 0;
+        character = 0;
+        t = 0;
+        remove = false;
+
+        currentText = text[index].Substring(2);
+        textRender.text = currentText;
+        icon.setTexture(new Texture(Sprite.renderer, "assets/sprites/gui/icons/" + text[index].Substring(1, 1) + ".png"));
+    }
+
     public override void tick()
     {
         if(Input.isMouseJustPressed(1) || Input.isJoyJustPressed(0, SDL2.SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A) || Input.isJoyJustPressed(1, SDL2.SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A))
@@ -51,6 +65,7 @@ public class TextBox : Entity
                         switch(text[index][2])
                         {
                             case '1': Game.playCutscene(new BobaRun()); break;
+                            case '2': Game.playCutscene(new GameEndFadeout()); break;
                         }
                         index++;
                     }

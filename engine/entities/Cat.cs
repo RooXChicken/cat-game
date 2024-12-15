@@ -12,11 +12,12 @@ public class Cat : LivingEntity
     protected double anim = 0;
     protected bool direction = true;
 
-    protected int state = -1;
+    public int state = -1;
     public int phaseDuration = 4;
     protected int time = 0;
-    protected Vector2d target = new Vector2d(0, 0);
+    public Vector2d target = new Vector2d(0, 0);
     protected int targettedPlayer = 0;
+    protected int spriteSize = 32;
 
     protected double[] speeds;
 
@@ -122,7 +123,7 @@ public class Cat : LivingEntity
                 drawable = idle;
         }
 
-        walk.textureBounds.x = (int)anim * 32;
+        walk.textureBounds.x = (int)anim * spriteSize;
 
         if(hasEffect(3))
             drawable = loaf;

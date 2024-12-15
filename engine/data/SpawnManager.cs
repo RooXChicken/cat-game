@@ -33,6 +33,24 @@ public class SpawnManager
             master.Add(item.clone());
     }
 
+    public void refill()
+    {
+        available.Add(new Item(6, UsableItem.fromID(6), true, false)); //boba tea
+        available.Add(new Item(7, UsableItem.fromID(7), true, false)); //coffee
+        available.Add(new Item(8, UsableItem.fromID(8), true, false)); //lucky bag
+        available.Add(new Item(9, UsableItem.fromID(9), true, false)); //chalk
+        available.Add(new Item(10, UsableItem.fromID(10), true, false)); //bread loaf
+        available.Add(new Item(11, UsableItem.fromID(11), false, false)); //clothing tag
+        available.Add(new Item(12, UsableItem.fromID(12), false, false)); //worn toy cat
+        available.Add(new Item(13, UsableItem.fromID(13), true, false)); //pineapple
+        available.Add(new Item(14, UsableItem.fromID(14), false, false)); //cinnamon
+        available.Add(new Item(15, UsableItem.fromID(15), true, false)); //mochi
+        available.Add(new Item(16, UsableItem.fromID(16), true, false)); //banana bread
+        available.Add(new Item(17, UsableItem.fromID(17), true, false)); //new world
+        available.Add(new Item(19, UsableItem.fromID(19), true, false)); //peanut butter apple
+        available.Add(new Item(20, UsableItem.fromID(20), true, false)); //polaroid
+    }
+
     public Entity getSpawn(Player player)
     {
         Item item = getItem(player);

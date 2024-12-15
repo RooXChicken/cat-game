@@ -4,6 +4,23 @@ using System.Security;
 
 public class BeanCat : Cat
 {
+    public bool dummy = false;
+    public bool isWheel { get { return false; } set
+    {
+        idle = new Sprite("assets/sprites/cats/bean/bean_wheel_run.png");
+        idle.textureBounds.w = 64;
+        walk = new Sprite("assets/sprites/cats/bean/bean_wheel_run.png");
+        hitbox.size = new Vector2d(48, 48);
+        walk.offset = new Vector2d(-8, -8);
+        speeds[0] = 0.9;
+        spriteSize = 64;
+        walk.textureBounds.w = 64;
+        shadow.shadow.size = new Vector2d(3, 3);
+        shadow.shadow.offset = new Vector2d(0, 48);
+        dealtDamage += 1.2;
+    }}
+
+    private int fadeTime = 0;
 
     public BeanCat(Vector2d _position) : base(_position)
     {
@@ -16,7 +33,7 @@ public class BeanCat : Cat
         
         drawable = idle;
 
-        maxHealth = 340;
+        maxHealth = 160;
         health = maxHealth;
         damageable = true;
 
@@ -28,6 +45,10 @@ public class BeanCat : Cat
     public override void processCatAI()
     {
         base.processCatAI();
+
+        if(dummy)
+            return;
+
         switch(state)
         {
             case 0: state_chaos(); break;
@@ -37,13 +58,13 @@ public class BeanCat : Cat
         }
     }
 
-    public override int getState() { return 0; }
+    public override int getState() { return dummy ? -2 : 0; }
 
     private void state_peace()
     {
         phaseDuration = 4;
         target = new Vector2d(10000, 10000);
-        drawable.color = new Color(255, 255, 255, (byte)Math.Max(0, 255-(++time*3)));
+        drawable.color = new Color(255, 255, 255, (byte)(Math.Clamp(255-(++fadeTime*3), 0, 255)));
 
         velocity = target.distanceSquared(getRawPosition()) > 1 ? target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+1) : new Vector2d(0, 0);
     }
@@ -56,6 +77,7 @@ public class BeanCat : Cat
         if(--time <= 0)
         {
             time = Game.random.Next(30, 160);
+            targettedPlayer = Game.random.Next(0, 2);
             target = ((Player)Game.entities[1][getTargettedPlayer()]).getCenter() + new Vector2d(Game.random.NextDouble() * 132 - 66, Game.random.NextDouble() * 132 - 66);
         }
     }
@@ -85,15 +107,13 @@ public class BeanCat : Cat
 
     public override void playAngryCutscene()
     {
-        //Game.playCutscene(new BeanAngry());
-        phaseDuration = 2400;
-
+        Game.playCutscene(new BeanAngry());
         base.playAngryCutscene();
     }
 
     public override void playWinCutscene()
     {
-        //Game.playCutscene(new BobaDefeat());
+        Game.playCutscene(new BeanDefeat());
         base.playWinCutscene();
     }
 }

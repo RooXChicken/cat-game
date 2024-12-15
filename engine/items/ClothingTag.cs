@@ -8,7 +8,7 @@ public class ClothingTag : UsableItem
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/generic_use.wav");
         id = 11;
 
         name = "Clothing Tag";
@@ -20,6 +20,7 @@ public class ClothingTag : UsableItem
     {
         player.addEffect(new Effect(4, 1200, false));
         destroy = true;
+        useSound.play();
 
         for(int i = 0; i < 20; i++)
             Game.spawnParticle(new DustParticle(player.getCenter() + new Vector2d(Game.random.NextDouble()*8-4, Game.random.NextDouble()*12-6)));

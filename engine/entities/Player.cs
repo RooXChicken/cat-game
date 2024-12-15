@@ -8,7 +8,7 @@ public class Player : LivingEntity
 {
     public int type { get; private set; }
     private int bg = -1;
-    private Sprite sit;
+    public Sprite sit { get; protected set; }
     private Sprite down;
     private Sprite idle;
     private Sprite idleArms;
@@ -133,8 +133,13 @@ public class Player : LivingEntity
         PlayerShadow shadow = new PlayerShadow(this);
         shadow.render = true;
         Game.spawnEntity(shadow);
+
+        // items.Add(UsableItem.fromID(3));
+        // items.Add(UsableItem.fromID(4));
+        // items.Add(UsableItem.fromID(18));
     }
 
+    public void makeSit() { drawable = sit; arms = idleArms; arms2 = new Sprite("assets/empty.png"); }
     public void moveFromCouch() { teleport(getRawPosition() + new Vector2d(14, 0)); }
 
     public override void tick()
@@ -206,13 +211,14 @@ public class Player : LivingEntity
             weaponHeldTimer = 0;
         }
 
-        foreach(UsableItem item in items)
-            if(item is Weapon) ((Weapon)item).tick();
+        Vector2d crosshairDirection = lastCrosshairPosition.getDirectionBetweenPoints(getCenter());
+        double shootAngle = Math.Abs(Math.Atan2(crosshairDirection.x, crosshairDirection.y)-3) * 60 - 90;
 
-        // if(Input.isPressed(SDL2.SDL.SDL_Keycode.SDLK_LSHIFT))
-        //     Game.GAME_SPEED = 0.1;
-        // else
-        //     Game.GAME_SPEED = 1.0;
+        foreach(UsableItem item in items)
+        {
+            if(item is Weapon) ((Weapon)item).tick();
+            if(item.autouse) item.use(this, crosshairDirection, getCenter()+crosshairDirection*3);
+        }
 
         if(crosshair.position.distanceSquared(getCenter()) > 8)
             lastCrosshairPosition = crosshair.position;
@@ -241,12 +247,6 @@ public class Player : LivingEntity
             if(heldItemTooltip != null)
                 heldItemTooltip.active = false;
         }
-
-        Vector2d crosshairDirection = lastCrosshairPosition.getDirectionBetweenPoints(getCenter());
-        double shootAngle = Math.Abs(Math.Atan2(crosshairDirection.x, crosshairDirection.y)-3) * 60 - 90;
-
-        // foreach(UsableItem item in items)
-        //     if(item.autouse) item.use(this, crosshairDirection, getCenter()+crosshairDirection*3);
 
         if(selectedWeapon < items.Count)
         {

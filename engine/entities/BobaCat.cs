@@ -4,6 +4,7 @@ using System.Security;
 
 public class BobaCat : Cat
 {
+    private int fadeTime = 0;
     private Sprite slide;
 
     public BobaCat(Vector2d _position) : base(_position)
@@ -18,7 +19,7 @@ public class BobaCat : Cat
         
         drawable = idle;
 
-        maxHealth = 140;
+        maxHealth = 200;
         health = maxHealth;
         damageable = true;
 
@@ -49,7 +50,8 @@ public class BobaCat : Cat
     {
         phaseDuration = 4;
         target = new Vector2d(10000, 10000);
-        drawable.color = new Color(255, 255, 255, (byte)Math.Max(0, 255-(++time*3)));
+        drawable.color = new Color(255, 255, 255, (byte)(Math.Clamp(255-(++fadeTime*3), 0, 255)));
+        // Console.WriteLine(255-(time*3));
 
         velocity = target.distanceSquared(getRawPosition()) > 1 ? target.getDirectionBetweenPoints(getRawPosition()).normalize() * (Game.random.NextDouble()/3+(speeds[1])) : new Vector2d(0, 0);
     }

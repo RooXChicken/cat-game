@@ -63,12 +63,12 @@ public class BobaRun : Cutscene
         window.cameraCenter = cameraCenter;
     }
 
-    public override void onRemove()
+    public override void onRemove(Game game)
     {
         //reset zoom
         window.zoom = 1.0;
 
         //code to move to next cat
-        base.onRemove();
+        base.onRemove(game);
     }
 }

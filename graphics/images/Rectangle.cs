@@ -15,6 +15,7 @@ public class Rectangle : Drawable
     public override void draw(nint surface, Vector2d cameraCenter)
     {
         base.draw(surface, cameraCenter);
+        
         SDL_Rect rect;
         rect.x = (int)(position.x - cameraCenter.x);
         rect.y = (int)(position.y - cameraCenter.y);

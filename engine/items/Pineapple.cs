@@ -8,7 +8,7 @@ public class Pineapple : UsableItem
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/eat.wav");
         id = 13;
 
         name = "Pineapple";
@@ -21,6 +21,8 @@ public class Pineapple : UsableItem
             player.heal(1);
         else if(player.type == 1)
             player.heal(6);
+
+        useSound.play();
             
         destroy = true;
 

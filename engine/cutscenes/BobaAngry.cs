@@ -11,6 +11,7 @@ public class BobaAngry : Cutscene
 
     private Sprite bobaangry;
     private double zoom = 1.0;
+    private SoundEffect bobaAngry;
 
     public BobaAngry() : base()
     {
@@ -19,6 +20,7 @@ public class BobaAngry : Cutscene
         haltGame = true;
         drawUI = false;
 
+        bobaAngry = new SoundEffect("assets/sounds/boba_becomeangry.wav");
         bobaangry = new Sprite("assets/sprites/cats/boba/boba_becomeangry.png");
         bobaangry.offset = new Vector2d(-4, -1);
         bobaangry.textureBounds.w = 32;
@@ -46,6 +48,9 @@ public class BobaAngry : Cutscene
                 zoom = double.Lerp(zoom, 1.0, 0.04);
             }
 
+            if(tick == 270)
+                bobaAngry.play();
+
             previousCameraPosition = cameraCenter;
         }
 
@@ -69,12 +74,12 @@ public class BobaAngry : Cutscene
         window.cameraCenter = cameraCenter;
     }
 
-    public override void onRemove()
+    public override void onRemove(Game game)
     {
         //reset zoom
         window.zoom = 1.0;
 
         //code to move to next cat
-        base.onRemove();
+        base.onRemove(game);
     }
 }

@@ -7,14 +7,20 @@ public class SoundEffect
 
     private nint pointer;
     public int loop;
+    private int channel = -1;
 
     public SoundEffect(string path, int _loop = 0)
     {
-        // if(!RenderWindow.audioEnabled)
-        //     return;
-        pointer = SDL_mixer.Mix_LoadWAV(path);
-        if(pointer == IntPtr.Zero)
-            Console.WriteLine("Failed to load sound file with path: " + path + "! " + SDL_mixer.Mix_GetError());
+        if(loadedSounds.ContainsKey(path))
+            pointer = loadedSounds[path];
+        else
+        {
+            pointer = SDL_mixer.Mix_LoadWAV(path);
+            if(pointer == IntPtr.Zero)
+                Console.WriteLine("Failed to load sound file with path: " + path + "! " + SDL_mixer.Mix_GetError());
+
+            loadedSounds.Add(path, pointer);
+        }
 
         loop = _loop;
     }
@@ -23,7 +29,22 @@ public class SoundEffect
     {
         // if(!RenderWindow.audioEnabled)
         //     return;
-        SDL_mixer.Mix_PlayChannel(-1, pointer, loop);
+        channel = SDL_mixer.Mix_PlayChannel(-1, pointer, loop);
+    }
+
+    public void playMusic()
+    {
+        SDL_mixer.Mix_PlayMusic(pointer, loop);
+    }
+
+    public void stopMusic()
+    {
+        SDL_mixer.Mix_PauseMusic();
+    }
+
+    public bool isPlaying()
+    {
+        return SDL_mixer.Mix_Playing(channel) == 1;
     }
 
     public static void destroyAll()

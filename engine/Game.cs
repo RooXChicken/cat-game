@@ -24,15 +24,19 @@ public class Game
     private Sprite bossbarFill;
     private static ParticleArray particles;
 
-    private TextBox textBox;
+    public static TextBox textBox;
     private Text phaseText;
 
     private Dictionary<Vector2d, bool> possibleSpawns;
+    public Music backgroundMusic;
 
-    private int t = 0;
+    public int t = 0;
+    public static CollidableDecor wheel;
 
     public Game(RenderWindow window)
     {
+        backgroundMusic = new Music("assets/sounds/slopee_music.wav");
+
         possibleSpawns = new Dictionary<Vector2d, bool>();
 
         possibleSpawns.Add(new Vector2d(32, 100), false);
@@ -44,15 +48,16 @@ public class Game
         possibleSpawns.Add(new Vector2d(32, 300), false);
 
         possibleSpawns.Add(new Vector2d(256, 300), true);
-        possibleSpawns.Add(new Vector2d(256, 322), true);
-        possibleSpawns.Add(new Vector2d(256, 344), true);
+        possibleSpawns.Add(new Vector2d(256, 320), true);
+        possibleSpawns.Add(new Vector2d(256, 340), true);
 
         possibleSpawns.Add(new Vector2d(256, 512), true);
-        possibleSpawns.Add(new Vector2d(256, 534), true);
-        possibleSpawns.Add(new Vector2d(256, 556), true);
-        possibleSpawns.Add(new Vector2d(256, 578), true);
+        possibleSpawns.Add(new Vector2d(256, 532), true);
+        possibleSpawns.Add(new Vector2d(256, 552), true);
+        possibleSpawns.Add(new Vector2d(256, 572), true);
 
         particles = new ParticleArray(window.renderer, "assets/sprites/particles.png");
+        phaseText = new Text(window.renderer, "Scavenge Phase", RenderWindow.font, Color.WHITE);
 
         tilemap = new Sprite("assets/sprites/room.png");
         bossbarOutline = new Sprite("assets/sprites/gui/bossbarOutline.png");
@@ -63,10 +68,28 @@ public class Game
 
         timer = new Timer();
 
+        loadEntities(0);
+
+        ItemPickup _treatPistol = new ItemPickup(UsableItem.fromID(2));
+        _treatPistol.teleport(new Vector2d(130, 164));
+        _treatPistol.onSpawn();
+        _treatPistol.shadow.render = true;
+        spawnEntity(_treatPistol);
+
+        phaseText.position = new Vector2d(260, 4);
+        textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!", "%_1", "%1We have to do something!", "%2She's just chilling", "%3...", "%1I feel like she's getting into tons of trouble.\nLet's try to find some things to\nhelp calm her down!" }, window.renderer, RenderWindow.font);
+    }
+
+    public void loadEntities(int cat)
+    {
+        backgroundMusic.stopMusic();
+
+        t = 0;
+        entities.Clear();
+
         for(int i = 0; i < 32; i++)
             entities.Add(i, new List<Entity>());
-
-        phaseText = new Text(window.renderer, "Scavenge Phase", RenderWindow.font, Color.WHITE);
+        
         spawnEntity(new ParticleRenderEntity(particles));
 
         spawnEntity(new SolidWall(new Vector2d(0, 16), new Vector2d(30, 1024)));
@@ -86,8 +109,17 @@ public class Game
         spawnEntity(new Player(0, new Vector2d(35, 218), 0));
         spawnEntity(new Player(1, new Vector2d(35, 242), 1));
 
-        spawnEntity(new BeanCat(new Vector2d(100, 200)));
-        spawnEntity(new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9))));
+        //replace third case with gerry
+        if(cat == 3)
+        {
+            spawnEntity(new BobaCat(new Vector2d(88, 172)));
+            spawnEntity(new BeanCat(new Vector2d(94, 140)));
+            spawnEntity(new GerryCat(new Vector2d(64, 162)));
+        }
+        else
+            spawnEntity((cat == 0) ? new BobaCat(new Vector2d(88, 172)) : (cat == 1) ? new BeanCat(new Vector2d(88, 172)) : new GerryCat(new Vector2d(88, 172)));
+        wheel = new CollidableDecor(new Sprite("assets/sprites/decor/wheel.png", new Vector2d(-19, -64)), new Vector2d(106, 86), new Hitbox(new Vector2d(30, 9)));
+        spawnEntity(wheel);
         spawnEntity(new CollidableDecor("assets/sprites/decor/table.png", new Vector2d(72, 220)));
         spawnEntity(new CollidableDecor("assets/sprites/decor/couch.png", new Vector2d(32, 212)));
         
@@ -106,20 +138,8 @@ public class Game
         spawnEntity(new CollidableDecor("assets/sprites/decor/bella_bookshelf.png", new Vector2d(308, 68), bookshelfHitbox));
         spawnEntity(new CollidableDecor("assets/sprites/decor/rug.png", new Vector2d(318, 124), new Hitbox(new Vector2d(0, 0)), false, -1));
 
-        ItemPickup _treatPistol = new ItemPickup(Weapon.fromID(2));
-        _treatPistol.teleport(new Vector2d(130, 164));
-        _treatPistol.onSpawn();
-        _treatPistol.shadow.render = true;
-        spawnEntity(_treatPistol);
-
         foreach(KeyValuePair<Vector2d, bool> location in possibleSpawns)
             spawnEntity(new StorageCabinet(location.Key, location.Value));
-
-        tick();
-        phaseText.position = new Vector2d(260, 4);
-        t = 0;
-        
-        textBox = new TextBox(new string[] { "%1What a relaxing day. Just me chilling with the cats.\nNothing beats this!", "%2I'm here too you know.", "%3You know what I meant, silly...", "%1...", "%1Boba, what are you doing...?", "%4BOBA!!!", "%_1", "%1We have to do something!", "%2She's just chilling", "%3...", "%1I feel like she's getting into tons of trouble.\nLet's try to find some things to\nhelp calm her down!" }, window.renderer, RenderWindow.font);
     }
 
     public void update()
@@ -138,20 +158,14 @@ public class Game
     {
         bool halt = false;
 
-        foreach(Cutscene _toPlay in toPlay)
-            activeCutscenes.Add(_toPlay);
-
-        toPlay.Clear();
-
-        List<Cutscene> toStop = new List<Cutscene>();
-        foreach(Cutscene cutscene in activeCutscenes)
+        for(int i = 0; i < activeCutscenes.Count; i++)
         {
+            Cutscene cutscene = activeCutscenes[i];
+
             cutscene.onTick();
-            if(cutscene.remove) { toStop.Add(cutscene); continue; }
+            if(cutscene.remove) { cutscene.onRemove(this); activeCutscenes.RemoveAt(i); continue; }
             if(cutscene.haltGame) halt = true;
         }
-
-        foreach(Cutscene _toStop in toStop) { _toStop.onRemove(); activeCutscenes.Remove(_toStop); }
 
         if(halt)
         {
@@ -163,12 +177,13 @@ public class Game
         {
             textBox.tick();
             Input.update();
-            //textBox.kill();
+            // textBox.kill();
 
             if(textBox.remove)
             {
                 ((Player)entities[1][0]).moveFromCouch();
                 ((Player)entities[1][1]).moveFromCouch();
+                backgroundMusic.playMusic();
             }
             return;
         }
@@ -189,44 +204,28 @@ public class Game
         foreach(StorageCabinet _interactable in entities[10])
             _interactable.interactable.tooltip.active = false;
 
-        List<Entity> removedEntities = new List<Entity>();
-        foreach(Entity entity in entities[0])
+        for(int i = 0; i < entities[0].Count; i++)
         {
+            Entity entity = entities[0][i];
             entity.tick();
+
             if(entity.remove)
-                removedEntities.Add(entity);
+            {
+                if(entity.collision != 0)
+                    entities[entity.collision].Remove(entity);
+
+                entities[0].RemoveAt(i);
+            }
         }
 
-        foreach(Entity entity in removedEntities)
+        for(int i = 0; i < particles.particles.Count; i++)
         {
-            if(entity.collision != 0)
-                entities[entity.collision].Remove(entity);
+            Particle particle = particles.particles[i];
 
-            entities[0].Remove(entity);
-        }
-
-        List<Entity> _toSpawn = [.. toSpawn];
-        toSpawn.Clear();
-
-        foreach(Entity spawn in _toSpawn)
-        {
-            spawn.onSpawn();
-            if(spawn.collision != 0)
-                entities[spawn.collision].Add(spawn);
-            entities[0].Add(spawn);
-        }
-
-        List<Particle> removedParticles = new List<Particle>();
-
-        foreach(Particle particle in particles.particles)
-        {
             particle.tick();
             if(particle.remove)
-                removedParticles.Add(particle);
+                particles.particles.RemoveAt(i);
         }
-
-        foreach(Particle particle in removedParticles)
-            particles.particles.Remove(particle);
 
         if(Input.isJustPressed(SDL.SDL_Keycode.SDLK_F3))
             debug = !debug;
@@ -298,7 +297,16 @@ public class Game
             cutscene.postDraw(window);
     }
 
-    public static void spawnEntity(Entity entity) { toSpawn.Add(entity); }
-    public static void playCutscene(Cutscene cutscene) { toPlay.Add(cutscene); }
+    public static void spawnEntity(Entity entity)
+    {
+        entity.onSpawn();
+
+        if(entity.collision != 0)
+            entities[entity.collision].Add(entity);
+
+        entities[0].Add(entity);
+    }
+
+    public static void playCutscene(Cutscene cutscene) { activeCutscenes.Add(cutscene); }
     public static void spawnParticle(Particle particle) { particles.particles.Add(particle); }
 }

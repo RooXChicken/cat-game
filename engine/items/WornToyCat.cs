@@ -1,7 +1,7 @@
 
 public class WornToyCat : UsableItem
 {
-    Player player;
+    private Player player;
 
     public WornToyCat(Player _player, bool doLogic = false) : base()
     {
@@ -11,7 +11,7 @@ public class WornToyCat : UsableItem
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/generic_use.wav");
         id = 12;
 
         if(doLogic && !player.hasEffect(5))
@@ -25,6 +25,7 @@ public class WornToyCat : UsableItem
     {
         destroy = true;
         
+        useSound.play();
         for(int i = 0; i < 20; i++)
             Game.spawnParticle(new DustParticle(player.getCenter() + new Vector2d(Game.random.NextDouble()*8-4, Game.random.NextDouble()*12-6)));
         return true;

@@ -4,6 +4,8 @@ public class Vector2d
     public double x;
     public double y;
 
+    public Vector2d() { x = 0; y = 0; }
+    public Vector2d(double _p) { x = _p; y = _p; }
     public Vector2d(double _x, double _y) { x = _x; y = _y; }
 
     public static explicit operator Vector2d(Vector2i a) { return new Vector2d(a.x, a.y); }
@@ -38,4 +40,9 @@ public class Vector2d
     }
 
     public static Vector2d lerp(Vector2d a, Vector2d b, double t) { return new Vector2d(double.Lerp(a.x, b.x, t), double.Lerp(a.y, b.y, t)); }
+
+    public override string ToString()
+    {
+        return "Vector2d { " + x + ", " + y + " }";
+    }
 }

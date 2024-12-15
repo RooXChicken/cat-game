@@ -6,12 +6,21 @@ https://blog.rubenwardy.com/2023/01/24/using_sdl_gamecontroller/
 gavin is wearing a beanie
 
 neccesary to FINISH THE GAME IN TIME:
-[x] add gavin (sprites, and multi player support)
-add other 3 cats
-add tutorial and main menu
 
-maybe adjust difficulty
-add a button to show what the item is (temporarily show tooltip)
+[x] add cat switching
+[x] add storage refilling
+fix bean's wheel sprite
+[x] polish bean ai
+[x] add bean cutscenes
+[x] add gerry
+[x] add gerry unique second phase twist
+add gerry cutscenes
+add ending ( b&g sitting back on the couch with all 3 cats )
+add main menu ( nothing complex, just two options ( start game (starts game), tutorial (shows tutorial graphic, with controls and premise of the game) ) )
+
+game name = B&G's Bad Cat Day
+
+add all extra items
 
 game ideas:
 

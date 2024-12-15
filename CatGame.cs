@@ -17,6 +17,6 @@
             window.display();
         }
 
-        window.destroy();
+        window.destroy(game);
     }
 }

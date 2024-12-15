@@ -8,7 +8,7 @@ public class Polaroid : UsableItem
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/generic_use.wav");
         id = 20;
 
         name = "Polaroid";
@@ -21,6 +21,7 @@ public class Polaroid : UsableItem
         if(distance > 32)
             return false;
 
+        useSound.play();
         ((Player)Game.entities[1][0]).heal(4);
         ((Player)Game.entities[1][1]).heal(4);
         destroy = true;

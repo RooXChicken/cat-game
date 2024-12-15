@@ -10,7 +10,7 @@ public class BananaBread : Weapon
         sprite.origin -= new Vector2d(2, 0);
         //sprite.origin += sprite.offset/2;
         //sprite.origin = new Vector2d(3, 5);
-        useSound = new SoundEffect("assets/sounds/gun_shoot.wav");
+        useSound = new SoundEffect("assets/sounds/eat.wav");
         id = 16;
 
         useTime = 30;
@@ -25,6 +25,7 @@ public class BananaBread : Weapon
         if(!base.use(player, direction, position))
             return false;
 
+        useSound.play();
         if(--uses == 0)
             destroy = true;
             

@@ -22,13 +22,15 @@ public class RenderWindow
     public uint rHeight { get; private set; }
 
     public string name { get; private set; }
-    private List<Drawable> toDrawNC;
+    private List<Drawable> toDrawUI;
 
     public double relativeSize { get { int width; int height; SDL_GetWindowSize(window, out width, out height); return width/gWidth; } set{} }
 
     private int lastFPSTimer = 0;
     private int countedFrames = 0;
     private int fps = 0;
+
+    public double fadeOut = 0;
 
     public RenderWindow(uint _gWidth, uint _gHeight, uint _rWidth, uint _rHeight, string _name)
     {
@@ -59,7 +61,7 @@ public class RenderWindow
         rHeight = _rHeight;
         name = _name;
 
-        toDrawNC = new List<Drawable>();
+        toDrawUI = new List<Drawable>();
 
         window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)rWidth, (int)rHeight, _flags);
         SDL_ShowCursor(SDL_DISABLE);
@@ -76,9 +78,10 @@ public class RenderWindow
 
         Sprite.setRenderer(renderer);
         surface = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, (int)gWidth, (int)gHeight);
+        SDL_SetTextureBlendMode(surface, SDL_BlendMode.SDL_BLENDMODE_BLEND);
     }
 
-    public void destroy()
+    public void destroy(Game game)
     {
         for(int i = 0; i < 4; i++)
             if(Input.registeredControllers[i] != IntPtr.Zero)
@@ -91,6 +94,7 @@ public class RenderWindow
         gameFont.destroy();
         Texture.destroyAll();
         SoundEffect.destroyAll();
+        game.backgroundMusic.destroy();
 
         SDL_DestroyTexture(surface);
         surface = IntPtr.Zero;
@@ -157,6 +161,10 @@ public class RenderWindow
     
     public void clear(Color color)
     {
+        SDL_SetRenderTarget(renderer, IntPtr.Zero);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
         SDL_SetRenderTarget(renderer, surface);
         if(SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a) < 0)
             Console.WriteLine("Error setting clear color! " + SDL_GetError());
@@ -171,31 +179,27 @@ public class RenderWindow
     public void draw(Drawable drawable) { drawable.draw(renderer, cameraCenter); }
     public void drawNC(Drawable drawable) { drawable.draw(renderer, new Vector2d(0, 0)); }
     
-    public void drawUI(Drawable drawable) { drawable.draw(renderer, new Vector2d(0, 0)); }
+    public void drawUI(Drawable drawable) { toDrawUI.Add(drawable); }
 
     public void display()
     {
         SDL_SetRenderTarget(renderer, IntPtr.Zero);
 
         SDL_Rect scaled;
-        scaled.x = (int)(gWidth * (1-zoom));
-        scaled.y = (int)(gHeight * (1-zoom));
+        scaled.x = (int)(rWidth * (1-zoom)/2);
+        scaled.y = (int)(rHeight * (1-zoom)/2);
         scaled.w = (int)(rWidth * zoom);
         scaled.h = (int)(rHeight * zoom);
+        
+        SDL_SetTextureAlphaMod(surface, (byte)(Math.Clamp(1-fadeOut, 0, 1)*255));
+
         SDL_RenderCopy(renderer, surface, IntPtr.Zero, ref scaled);
 
-        // SDL_SetRenderTarget(renderer, surface);
+        foreach(Drawable drawable in toDrawUI)
+            drawNC(drawable);
 
-        // SDL_SetTextureAlphaMod(renderer, 0);
-        // SDL_RenderClear(renderer);
-
-        // foreach(Drawable drawable in toDrawNC)
-        //     drawable.draw(renderer, new Vector2d(0, 0));
-
-        // SDL_SetRenderTarget(renderer, IntPtr.Zero);
-        // SDL_RenderCopy(renderer, surface, IntPtr.Zero, IntPtr.Zero);
-
-
+        toDrawUI.Clear();
+        
         SDL_RenderPresent(renderer);
 
         countedFrames++;
@@ -204,8 +208,6 @@ public class RenderWindow
             lastFPSTimer = (int)(SDL_GetTicks() / 1000);
             fps = countedFrames;
             countedFrames = 0;
-
-            Console.WriteLine(fps);
         }
     }
 
